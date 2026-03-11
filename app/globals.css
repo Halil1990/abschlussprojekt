@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --nordwerk-orange: #F58220;
+  --nordwerk-black: #000000;
+}
+
+/* Prevent horizontal overflow on mobile */
+html, body {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Custom Utilities */
+.bg-nordwerk-orange {
+  background-color: var(--nordwerk-orange);
+}
+
+.text-nordwerk-orange {
+  color: var(--nordwerk-orange);
+}
+
+.bg-nordwerk-black {
+  background-color: var(--nordwerk-black);
+}
+
+.text-nordwerk-black {
+  color: var(--nordwerk-black);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+section[id] {
+  scroll-margin-top: 120px;
+}
+
+/* Better touch targets on mobile */
+@media (max-width: 640px) {
+  input, textarea, button, a {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  input, textarea {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+}
