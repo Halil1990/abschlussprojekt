@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
     await transporter.sendMail({
       from: `"Nordwerk Website" <${process.env.SMTP_USER}>`,
-      to: process.env.CONTACT_EMAIL || 'info@k-k-solutions.de',
+      to: process.env.CONTACT_EMAIL || 'a.knoth@k-k-solutions.de',
       replyTo: email,
       subject: `Neue Anfrage von ${name}`,
       html: `

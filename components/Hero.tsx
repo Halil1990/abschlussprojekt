@@ -14,7 +14,7 @@ export default function Hero() {
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/50 to-black/30"></div>
 
-      <div className="relative z-10 text-center px-4 sm:px-6 max-w-3xl pt-[18vh] sm:pt-[21vh]">
+      <div className="relative z-10 text-center px-4 sm:px-6 max-w-3xl pt-[28vh] sm:pt-[30vh]">
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
           Arbeitskleidung mit <span className="text-nordwerk-orange">System</span>
         </h1>

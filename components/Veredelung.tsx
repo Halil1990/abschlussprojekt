@@ -168,7 +168,7 @@ export default function Veredelung() {
                   alt={`Platzierung ${index + 1}`}
                   width={400}
                   height={400}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover scale-[1.15]"
                 />
               </div>
             ))}
@@ -312,14 +312,16 @@ export default function Veredelung() {
             ›
           </button>
 
-          <Image
-            src={placementImages[placementIndex]}
-            alt={`Platzierung ${placementIndex + 1} (vergrößert)`}
-            width={800}
-            height={800}
-            className="max-w-[90vw] sm:max-w-[70vw] md:max-w-[60vw] max-h-[70vh] sm:max-h-[60vh] rounded-2xl shadow-2xl object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
+          <div className="overflow-hidden rounded-2xl max-w-[90vw] sm:max-w-[70vw] md:max-w-[60vw] max-h-[70vh] sm:max-h-[60vh]">
+            <Image
+              src={placementImages[placementIndex]}
+              alt={`Platzierung ${placementIndex + 1} (vergrößert)`}
+              width={800}
+              height={800}
+              className="w-full h-full shadow-2xl object-cover scale-[1.1]"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
 
           {/* Counter */}
           <p className="text-white text-sm sm:text-base mt-3">

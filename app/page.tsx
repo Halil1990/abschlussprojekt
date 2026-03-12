@@ -8,6 +8,7 @@ import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import About from '../components/About';
 import Veredelung from '../components/Veredelung';
+import Partners from '../components/Partners';
 
 export default function Page() {
   useEffect(() => {
@@ -36,6 +37,7 @@ export default function Page() {
           
           <ProductionGallery />
           <Veredelung />
+          <Partners />
           <ContactForm />
         </div>
       </div>
