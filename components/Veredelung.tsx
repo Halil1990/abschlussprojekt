@@ -256,13 +256,6 @@ export default function Veredelung() {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer p-4"
           onClick={() => setLightboxOpen(false)}
         >
-          <button
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white text-3xl sm:text-4xl font-bold hover:text-nordwerk-orange transition-colors"
-            onClick={() => setLightboxOpen(false)}
-            aria-label="Schließen"
-          >
-            ✕
-          </button>
           <Image
             src="/image0.png"
             alt="Veredelung – Stick und Textildruck (vergrößert)"
@@ -286,14 +279,6 @@ export default function Veredelung() {
           className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm cursor-pointer p-4"
           onClick={() => setPlacementIndex(null)}
         >
-          <button
-            className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white text-3xl sm:text-4xl font-bold hover:text-nordwerk-orange transition-colors"
-            onClick={() => setPlacementIndex(null)}
-            aria-label="Schließen"
-          >
-            ✕
-          </button>
-
           {/* Prev Button */}
           <button
             className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 text-white text-4xl sm:text-5xl font-bold hover:text-nordwerk-orange transition-colors z-10"

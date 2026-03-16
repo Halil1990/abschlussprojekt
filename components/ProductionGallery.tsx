@@ -103,7 +103,7 @@ export default function ProductionGallery() {
 
         {/* Flat Slider Carousel */}
         <div
-          className="relative mx-auto select-none overflow-hidden"
+          className="relative mx-auto select-none overflow-hidden border-gray-400"
           ref={trackRef}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -132,7 +132,7 @@ export default function ProductionGallery() {
                     className={`max-w-md mx-auto bg-white/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 text-left flex flex-col border-2 transition-all duration-500 ${
                       isActive
                         ? 'border-nordwerk-orange shadow-[0_4px_20px_rgba(245,130,32,0.2)] scale-100'
-                        : 'border-gray-200 shadow-sm scale-95 opacity-60'
+                        : 'border-gray-400 shadow-sm scale-95 opacity-60'
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-3">
@@ -163,7 +163,7 @@ export default function ProductionGallery() {
         <div className="flex items-center justify-center gap-4 mt-5">
           <button
             onClick={() => { prev(); }}
-            className="w-9 h-9 rounded-full bg-nordwerk-orange text-white flex items-center justify-center text-lg font-bold hover:scale-110 hover:bg-orange-500 active:scale-95 transition-all shadow-lg cursor-pointer"
+            className="w-12 h-12 rounded-full bg-nordwerk-orange text-white flex items-center justify-center text-lg font-bold hover:scale-110 hover:bg-orange-500 active:scale-95 transition-all shadow-lg cursor-pointer"
             aria-label="Vorherige Karte"
           >
             ‹
@@ -186,7 +186,7 @@ export default function ProductionGallery() {
 
           <button
             onClick={() => { next(); }}
-            className="w-9 h-9 rounded-full bg-nordwerk-orange text-white flex items-center justify-center text-lg font-bold hover:scale-110 hover:bg-orange-500 active:scale-95 transition-all shadow-lg cursor-pointer"
+            className="w-12 h-12 rounded-full bg-nordwerk-orange text-white flex items-center justify-center text-lg font-bold hover:scale-110 hover:bg-orange-500 active:scale-95 transition-all shadow-lg cursor-pointer"
             aria-label="Nächste Karte"
           >
             ›
