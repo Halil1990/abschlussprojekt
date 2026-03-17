@@ -25,6 +25,7 @@ import DraggableAssetCard from "./components/DraggableAssetCard";
 import WorkwearZone from "./components/WorkwearZone";
 import {
   DEFAULT_WORKWEAR_INDEX,
+  MAX_ZONES_PER_WORKWEAR_IMAGE,
   WORKWEAR_IMAGES,
   INITIAL_ZONE_RECT,
   PREVIEW_DROP_ID,
@@ -42,29 +43,16 @@ import {
   clampScale,
   clampZoneWidth,
   createZone,
+  getArtworkTransform,
   maxPanForZoom,
 } from "./utils";
-
-type WorkwearZoneState = {
-  zones: ZoneRect[];
-  selectedZoneId: string;
-  nextZoneIndex: number;
-};
-
-function createInitialWorkwearZoneState(): WorkwearZoneState {
-  const firstZone = createZone(1);
-
-  return {
-    zones: [firstZone],
-    selectedZoneId: firstZone.id,
-    nextZoneIndex: 2,
-  };
-}
-
-function getValidSelectedZoneId(zones: ZoneRect[], preferredZoneId: string) {
-  if (zones.some((zone) => zone.id === preferredZoneId)) return preferredZoneId;
-  return zones[0]?.id ?? "zone-1";
-}
+import {
+  createInitialWorkwearZoneState,
+  getOrCreateWorkwearZoneState,
+  getValidSelectedZoneId,
+  snapshotWorkwearZoneState,
+  type WorkwearZoneState,
+} from "./workwearState";
 
 export default function Konfigurator() {
   const initialWorkwearZoneState = createInitialWorkwearZoneState();
@@ -111,6 +99,7 @@ export default function Konfigurator() {
   const selectedAsset = selectedZone?.assetId
     ? assetMap.get(selectedZone.assetId)
     : undefined;
+  const hasReachedZoneLimit = zones.length >= MAX_ZONES_PER_WORKWEAR_IMAGE;
   const activeWorkwearImage = WORKWEAR_IMAGES[activeWorkwearIndex];
 
   useEffect(() => {
@@ -174,6 +163,8 @@ export default function Konfigurator() {
   }
 
   function addZone() {
+    if (hasReachedZoneLimit) return;
+
     const nextIndex = zoneCounterRef.current;
     zoneCounterRef.current += 1;
 
@@ -309,33 +300,24 @@ export default function Konfigurator() {
   }
 
   function saveCurrentWorkwearState(index: number) {
-    workwearStateRef.current[index] = {
+    workwearStateRef.current[index] = snapshotWorkwearZoneState(
       zones,
-      selectedZoneId: getValidSelectedZoneId(zones, selectedZoneId),
-      nextZoneIndex: zoneCounterRef.current,
-    };
+      selectedZoneId,
+      zoneCounterRef.current,
+    );
   }
 
   function loadWorkwearState(index: number) {
-    const savedState = workwearStateRef.current[index];
+    const savedState = getOrCreateWorkwearZoneState(workwearStateRef.current, index);
 
-    if (savedState) {
-      const validSelectedZoneId = getValidSelectedZoneId(
-        savedState.zones,
-        savedState.selectedZoneId,
-      );
+    const validSelectedZoneId = getValidSelectedZoneId(
+      savedState.zones,
+      savedState.selectedZoneId,
+    );
 
-      setZones(savedState.zones);
-      setSelectedZoneId(validSelectedZoneId);
-      zoneCounterRef.current = savedState.nextZoneIndex;
-      return;
-    }
-
-    const initialState = createInitialWorkwearZoneState();
-    workwearStateRef.current[index] = initialState;
-    setZones(initialState.zones);
-    setSelectedZoneId(initialState.selectedZoneId);
-    zoneCounterRef.current = initialState.nextZoneIndex;
+    setZones(savedState.zones);
+    setSelectedZoneId(validSelectedZoneId);
+    zoneCounterRef.current = savedState.nextZoneIndex;
   }
 
   function changeWorkwearImage(direction: -1 | 1) {
@@ -504,7 +486,8 @@ export default function Konfigurator() {
                   <button
                     type="button"
                     onClick={addZone}
-                    className="rounded-md bg-nordwerk-orange px-3 py-2 text-xs font-semibold text-black transition hover:opacity-90"
+                    disabled={hasReachedZoneLimit}
+                    className="rounded-md bg-nordwerk-orange px-3 py-2 text-xs font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Neue Zone
                   </button>
@@ -512,6 +495,9 @@ export default function Konfigurator() {
                 <p className="mt-1 text-sm text-white/65">
                   Bei Bedarf neue Zone erstellen und dann ein Logo per Drag and
                   Drop oder Klick zuweisen.
+                </p>
+                <p className="mt-1 text-xs text-white/50">
+                  Zonen pro Bild: {zones.length} / {MAX_ZONES_PER_WORKWEAR_IMAGE}
                 </p>
 
                 <label className="mt-4 block">
@@ -808,7 +794,7 @@ export default function Konfigurator() {
                                       alt={zoneAsset.name}
                                       className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
                                       style={{
-                                        transform: `translate(${zone.artworkOffset.x}px, ${zone.artworkOffset.y}px) scale(${zone.scale})`,
+                                        transform: getArtworkTransform(zone),
                                         transformOrigin: "center",
                                       }}
                                     />
