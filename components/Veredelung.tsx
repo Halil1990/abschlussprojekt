@@ -63,9 +63,9 @@ export default function Veredelung() {
         </div>
 
         {/* Veredelungsbild */}
-        <div className="mb-8 sm:mb-12 flex justify-center px-4">
+        <div className="mb-8 sm:mb-12 flex justify-center px-4 bg-white">
           <Image
-            src="/image0.png"
+            src="/druck.jpg"
             alt="Veredelung – Stick und Textildruck"
             width={400}
             height={400}
@@ -81,7 +81,7 @@ export default function Veredelung() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16">
 
           {/* Textildruck */}
-          <div className="bg-white p-5 sm:p-6 md:p-8 rounded-2xl shadow-xl text-center">
+          <div className="bg-gray-200 p-5 sm:p-6 md:p-8 rounded-2xl shadow-xl text-center">
             <div className="text-2xl sm:text-3xl mb-3 sm:mb-4"></div>
             <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3">Textildruck</h3>
             <p className="text-gray-600 mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base">
@@ -99,7 +99,7 @@ export default function Veredelung() {
           </div>
 
           {/* Stick */}
-          <div className="bg-white p-5 sm:p-6 md:p-8 rounded-2xl shadow-xl text-center">
+          <div className="bg-gray-200 p-5 sm:p-6 md:p-8 rounded-2xl shadow-xl text-center">
             <div className="text-2xl sm:text-3xl mb-3 sm:mb-4"></div>
             <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3">Stick</h3>
             <p className="text-gray-600 mb-3 sm:mb-4 leading-relaxed text-sm sm:text-base">
@@ -118,7 +118,7 @@ export default function Veredelung() {
         </div>
 
         {/* Warum professionelle Veredelung */}
-        <div className="bg-gray-100 p-6 sm:p-8 md:p-10 rounded-2xl shadow-lg mb-8 sm:mb-12 md:mb-16">
+        <div className="bg-gray-200 p-6 sm:p-8 md:p-10 rounded-2xl shadow-lg mb-8 sm:mb-12 md:mb-16">
           <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-3 sm:mb-4 text-center">
             Präzise Umsetzung – abgestimmt auf Material &amp; Einsatz
           </h3>
@@ -214,7 +214,7 @@ export default function Veredelung() {
         </div>
 
         {/* Zielgruppen */}
-        <div className="bg-white p-6 sm:p-8 md:p-10 rounded-2xl shadow-xl text-center">
+        <div className="bg-gray-200 p-6 sm:p-8 md:p-10 rounded-2xl shadow-xl text-center">
           <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6">
             Für <span className="text-nordwerk-orange">Handwerk &amp; Industrie</span>
           </h3>
@@ -257,7 +257,7 @@ export default function Veredelung() {
           onClick={() => setLightboxOpen(false)}
         >
           <Image
-            src="/image0.png"
+            src="/druck.jpg"
             alt="Veredelung – Stick und Textildruck (vergrößert)"
             width={800}
             height={800}

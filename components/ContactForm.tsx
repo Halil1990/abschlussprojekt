@@ -75,7 +75,7 @@ export default function ContactForm() {
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 sm:space-y-6 bg-white p-5 sm:p-6 md:p-8 rounded-2xl shadow-xl"
+          className="space-y-4 sm:space-y-6 bg-white p-5 sm:p-6 md:p-8 rounded-2xl shadow-xl border border-gray-400"
         >
           <input
             name="name"

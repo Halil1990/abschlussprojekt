@@ -35,13 +35,23 @@ export default function About() {
             </p>
           </div>
   
-          <div className="bg-gray-100 h-48 sm:h-64 md:h-80 rounded-2xl flex items-center justify-center overflow-hidden order-1 md:order-2 relative">
-            <Image
-              src="/banner.png"
-              alt="Nordwerk Team & Produktion"
-              fill
-              className="object-cover rounded-2xl"
-            />
+          <div className="bg-white h-32 sm:h-48 md:h-64 rounded-2xl flex items-center justify-center overflow-hidden order-1 md:order-2 relative flex flex-row gap-4">
+            <div className="flex-1 relative h-full">
+              <Image
+                src="/schweißer.jpg"
+                alt="Schweißer"
+                fill
+                className="object-cover rounded-2xl"
+              />
+            </div>
+            <div className="flex-1 relative h-full">
+              <Image
+                src="/arbeiter.jpg"
+                alt="Arbeiter"
+                fill
+                className="object-cover rounded-2xl"
+              />
+            </div>
           </div>
   
         </div>

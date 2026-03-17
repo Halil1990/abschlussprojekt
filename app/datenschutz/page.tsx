@@ -10,7 +10,7 @@ export default function DatenschutzPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen pt-40 sm:pt-48 pb-16 sm:pb-24 px-4 sm:px-6 bg-cover bg-center bg-no-repeat bg-fixed" style={{ backgroundImage: "url('/hintergrund.jpg')" }}>
+      <main className="min-h-screen pt-40 sm:pt-48 pb-16 sm:pb-24 px-4 sm:px-6 bg-cover bg-center bg-no-repeat bg-fixed">
         <div className="max-w-3xl mx-auto text-black text-center">
           <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-black">Datenschutzerklärung</h1>
 

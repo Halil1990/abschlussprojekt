@@ -28,13 +28,9 @@ export default function Page() {
       <Navbar />
       <Hero />
       <About />
-      <div
-        className="relative bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/hintergrund.jpg')" }}
-      >
+      <div className="relative bg-cover bg-center bg-no-repeat">
         <div className="absolute inset-0 bg-white/60"></div>
         <div className="relative z-10">
-          
           <ProductionGallery />
           <Veredelung />
           <Partners />
