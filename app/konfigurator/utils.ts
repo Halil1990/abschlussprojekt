@@ -33,3 +33,7 @@ export function createZone(index: number): ZoneRect {
 export function maxPanForZoom(zoom: number) {
   return (zoom - 1) * 45;
 }
+
+export function getArtworkTransform(zone: Pick<ZoneRect, 'artworkOffset' | 'rotation' | 'scale'>) {
+  return `translate(${zone.artworkOffset.x}px, ${zone.artworkOffset.y}px) rotate(${zone.rotation}deg) scale(${zone.scale})`;
+}

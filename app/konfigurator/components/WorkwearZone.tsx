@@ -4,6 +4,7 @@ import { useDroppable } from '@dnd-kit/core';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 
 import type { Asset, ZoneRect } from '../types';
+import { getArtworkTransform } from '../utils';
 
 type WorkwearZoneProps = {
   zone: ZoneRect;
@@ -94,7 +95,7 @@ export default function WorkwearZone({
             alt={asset.name}
             className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
             style={{
-              transform: `translate(${zone.artworkOffset.x}px, ${zone.artworkOffset.y}px) rotate(${zone.rotation}deg) scale(${zone.scale})`,
+              transform: getArtworkTransform(zone),
               transformOrigin: 'center',
             }}
           />
