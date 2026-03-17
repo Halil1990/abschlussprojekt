@@ -5,7 +5,7 @@ import type { PointerEvent as ReactPointerEvent } from 'react';
 
 import type { Asset, ZoneRect } from '../types';
 
-type GarmentZoneProps = {
+type WorkwearZoneProps = {
   zone: ZoneRect;
   asset: Asset | undefined;
   isSelected: boolean;
@@ -21,7 +21,7 @@ type GarmentZoneProps = {
   onArtworkDragEnd: (event: ReactPointerEvent<HTMLButtonElement>) => void;
 };
 
-export default function GarmentZone({
+export default function WorkwearZone({
   zone,
   asset,
   isSelected,
@@ -35,7 +35,7 @@ export default function GarmentZone({
   onArtworkDragStart,
   onArtworkDragMove,
   onArtworkDragEnd,
-}: GarmentZoneProps) {
+}: WorkwearZoneProps) {
   const { isOver, setNodeRef } = useDroppable({ id: zoneDropPrefix + zone.id });
 
   return (

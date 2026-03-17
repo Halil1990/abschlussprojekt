@@ -22,10 +22,10 @@ import {
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 import DraggableAssetCard from "./components/DraggableAssetCard";
-import GarmentZone from "./components/GarmentZone";
+import WorkwearZone from "./components/WorkwearZone";
 import {
-  DEFAULT_GARMENT_INDEX,
-  GARMENT_IMAGES,
+  DEFAULT_WORKWEAR_INDEX,
+  WORKWEAR_IMAGES,
   INITIAL_ZONE_RECT,
   PREVIEW_DROP_ID,
   ZONE_DROP_PREFIX,
@@ -50,8 +50,9 @@ export default function Konfigurator() {
   const [zones, setZones] = useState<ZoneRect[]>([createZone(1)]);
   const [selectedZoneId, setSelectedZoneId] = useState("zone-1");
   const [previewOnly, setPreviewOnly] = useState(false);
-  const [activeGarmentIndex, setActiveGarmentIndex] =
-    useState(DEFAULT_GARMENT_INDEX);
+  const [activeWorkwearIndex, setActiveWorkwearIndex] = useState(
+    DEFAULT_WORKWEAR_INDEX,
+  );
   const [viewZoom, setViewZoom] = useState(1);
   const [viewPan, setViewPan] = useState({ x: 0, y: 0 });
   const [viewPanDrag, setViewPanDrag] = useState<PanDragState | null>(null);
@@ -82,7 +83,7 @@ export default function Konfigurator() {
   const selectedAsset = selectedZone?.assetId
     ? assetMap.get(selectedZone.assetId)
     : undefined;
-  const activeGarmentImage = GARMENT_IMAGES[activeGarmentIndex];
+  const activeWorkwearImage = WORKWEAR_IMAGES[activeWorkwearIndex];
 
   useEffect(() => {
     const urls = urlsRef.current;
@@ -271,9 +272,10 @@ export default function Konfigurator() {
     setViewPan({ x: 0, y: 0 });
   }
 
-  function changeGarmentImage(direction: -1 | 1) {
-    setActiveGarmentIndex((prev) => {
-      const next = (prev + direction + GARMENT_IMAGES.length) % GARMENT_IMAGES.length;
+  function changeWorkwearImage(direction: -1 | 1) {
+    setActiveWorkwearIndex((prev) => {
+      const next =
+        (prev + direction + WORKWEAR_IMAGES.length) % WORKWEAR_IMAGES.length;
       return next;
     });
     resetView();
@@ -596,7 +598,8 @@ export default function Konfigurator() {
                     Kleidungszoom: {viewZoom.toFixed(1)}x
                   </p>
                   <p className="mt-1 text-xs text-white/50">
-                    Produktbild: {activeGarmentIndex + 1} / {GARMENT_IMAGES.length}
+                    Produktbild: {activeWorkwearIndex + 1} /{" "}
+                    {WORKWEAR_IMAGES.length}
                   </p>
                   <p className="mt-1 text-xs text-white/50">
                     Zoom: Mausrad ueber der Vorschau (Shift = groessere
@@ -651,107 +654,108 @@ export default function Konfigurator() {
                     <div className="relative">
                       <button
                         type="button"
-                        onClick={() => changeGarmentImage(-1)}
+                        onClick={() => changeWorkwearImage(-1)}
                         aria-label="Vorheriges Produktbild"
                         className="absolute left-1 top-1/2 z-40 -translate-y-1/2 rounded-full border border-white/35 bg-black/55 px-3 py-2 text-lg font-semibold text-white transition hover:bg-black/70 sm:left-2"
                       >
-                        {'<'}
+                        {"<"}
                       </button>
 
                       <button
                         type="button"
-                        onClick={() => changeGarmentImage(1)}
+                        onClick={() => changeWorkwearImage(1)}
                         aria-label="Naechstes Produktbild"
                         className="absolute right-1 top-1/2 z-40 -translate-y-1/2 rounded-full border border-white/35 bg-black/55 px-3 py-2 text-lg font-semibold text-white transition hover:bg-black/70 sm:right-2"
                       >
-                        {'>'}
+                        {">"}
                       </button>
 
-                    <div
-                      ref={(node) => {
-                        previewFrameRef.current = node;
-                        setPreviewDropRef(node);
-                      }}
-                      className={`relative mx-auto w-full overflow-hidden ${viewZoom > 1 ? (viewPanDrag ? "cursor-grabbing" : "cursor-grab") : ""}`}
-                      style={{ aspectRatio: "768 / 1366" }}
-                      onPointerDown={handleViewPanStart}
-                      onPointerMove={handleViewPanMove}
-                      onPointerUp={handleViewPanEnd}
-                      onPointerCancel={handleViewPanEnd}
-                    >
                       <div
-                        className="absolute inset-0 origin-center transition-transform duration-200"
-                        style={{
-                          transform: `translate(${viewPan.x}%, ${viewPan.y}%) scale(${viewZoom})`,
+                        ref={(node) => {
+                          previewFrameRef.current = node;
+                          setPreviewDropRef(node);
                         }}
+                        className={`relative mx-auto w-full overflow-hidden ${viewZoom > 1 ? (viewPanDrag ? "cursor-grabbing" : "cursor-grab") : ""}`}
+                        style={{ aspectRatio: "768 / 1366" }}
+                        onPointerDown={handleViewPanStart}
+                        onPointerMove={handleViewPanMove}
+                        onPointerUp={handleViewPanEnd}
+                        onPointerCancel={handleViewPanEnd}
                       >
-                        <Image
-                          src={activeGarmentImage}
-                          alt="Workwear Shirt"
-                          fill
-                          priority
-                          sizes="(max-width: 1280px) 100vw, 620px"
-                          className="pointer-events-none select-none object-contain"
-                        />
+                        <div
+                          className="absolute inset-0 origin-center transition-transform duration-200"
+                          style={{
+                            transform: `translate(${viewPan.x}%, ${viewPan.y}%) scale(${viewZoom})`,
+                          }}
+                        >
+                          <Image
+                            src={activeWorkwearImage}
+                            alt="Workwear Shirt"
+                            fill
+                            priority
+                            sizes="(max-width: 1280px) 100vw, 620px"
+                            className="pointer-events-none select-none object-contain"
+                          />
 
-                        {previewOnly
-                          ? zones.map((zone) => {
-                              const zoneAsset = zone.assetId
-                                ? assetMap.get(zone.assetId)
-                                : undefined;
-                              if (!zoneAsset) return null;
+                          {previewOnly
+                            ? zones.map((zone) => {
+                                const zoneAsset = zone.assetId
+                                  ? assetMap.get(zone.assetId)
+                                  : undefined;
+                                if (!zoneAsset) return null;
 
-                              return (
-                                <div
-                                  key={zone.id}
-                                  style={{
-                                    left: zone.x + "%",
-                                    top: zone.y + "%",
-                                    width: zone.w + "%",
-                                    height: zone.h + "%",
-                                  }}
-                                  className="absolute overflow-hidden"
-                                >
-                                  <img
-                                    src={zoneAsset.src}
-                                    alt={zoneAsset.name}
-                                    className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
+                                return (
+                                  <div
+                                    key={zone.id}
                                     style={{
-                                      transform: `translate(${zone.artworkOffset.x}px, ${zone.artworkOffset.y}px) scale(${zone.scale})`,
-                                      transformOrigin: "center",
+                                      left: zone.x + "%",
+                                      top: zone.y + "%",
+                                      width: zone.w + "%",
+                                      height: zone.h + "%",
                                     }}
-                                  />
-                                </div>
-                              );
-                            })
-                          : zones.map((zone) => (
-                              <GarmentZone
-                                key={zone.id}
-                                zone={zone}
-                                asset={
-                                  zone.assetId
-                                    ? assetMap.get(zone.assetId)
-                                    : undefined
-                                }
-                                isSelected={selectedZone?.id === zone.id}
-                                previewIsOver={
-                                  isOverPreview && selectedZone?.id === zone.id
-                                }
-                                zoneDropPrefix={ZONE_DROP_PREFIX}
-                                onSelect={setSelectedZoneId}
-                                onRegisterNode={(zoneId, node) => {
-                                  zoneBoxRefs.current[zoneId] = node;
-                                }}
-                                onZoneDragStart={handleZoneDragStart}
-                                onZoneDragMove={handleZoneDragMove}
-                                onZoneDragEnd={handleZoneDragEnd}
-                                onArtworkDragStart={handleArtworkDragStart}
-                                onArtworkDragMove={handleArtworkDragMove}
-                                onArtworkDragEnd={handleArtworkDragEnd}
-                              />
-                            ))}
+                                    className="absolute overflow-hidden"
+                                  >
+                                    <img
+                                      src={zoneAsset.src}
+                                      alt={zoneAsset.name}
+                                      className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
+                                      style={{
+                                        transform: `translate(${zone.artworkOffset.x}px, ${zone.artworkOffset.y}px) scale(${zone.scale})`,
+                                        transformOrigin: "center",
+                                      }}
+                                    />
+                                  </div>
+                                );
+                              })
+                            : zones.map((zone) => (
+                                <WorkwearZone
+                                  key={zone.id}
+                                  zone={zone}
+                                  asset={
+                                    zone.assetId
+                                      ? assetMap.get(zone.assetId)
+                                      : undefined
+                                  }
+                                  isSelected={selectedZone?.id === zone.id}
+                                  previewIsOver={
+                                    isOverPreview &&
+                                    selectedZone?.id === zone.id
+                                  }
+                                  zoneDropPrefix={ZONE_DROP_PREFIX}
+                                  onSelect={setSelectedZoneId}
+                                  onRegisterNode={(zoneId, node) => {
+                                    zoneBoxRefs.current[zoneId] = node;
+                                  }}
+                                  onZoneDragStart={handleZoneDragStart}
+                                  onZoneDragMove={handleZoneDragMove}
+                                  onZoneDragEnd={handleZoneDragEnd}
+                                  onArtworkDragStart={handleArtworkDragStart}
+                                  onArtworkDragMove={handleArtworkDragMove}
+                                  onArtworkDragEnd={handleArtworkDragEnd}
+                                />
+                              ))}
+                        </div>
                       </div>
-                    </div>
                     </div>
                   </div>
                 </div>
