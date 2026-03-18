@@ -1,16 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap');
 @import "tailwindcss";
 
 :root {
   --nordwerk-orange: #F58220;
   --nordwerk-black: #000000;
+  --font-main: "Montserrat" ;
+}
+ 
+body {
+  font-family: var(--font-main); /* Font für alles */
 }
 
 /* Prevent horizontal overflow on mobile */
 html, body {
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat'; /* Font für alles */
 }
 
 /* Custom Utilities */
