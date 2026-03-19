@@ -54,6 +54,17 @@ import {
   type WorkwearZoneState,
 } from "./workwearState";
 
+const WORKWEAR_STATE_STORAGE_KEY = "konfigurator-workwear-state-v1";
+
+type PersistedWorkwearState = {
+  activeWorkwearIndex: number;
+  workwearStateByIndex: Record<string, WorkwearZoneState>;
+};
+
+function isObjectRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
 export default function Konfigurator() {
   const initialWorkwearZoneState = createInitialWorkwearZoneState();
 
@@ -77,6 +88,7 @@ export default function Konfigurator() {
   const workwearStateRef = useRef<Record<number, WorkwearZoneState>>({
     [DEFAULT_WORKWEAR_INDEX]: initialWorkwearZoneState,
   });
+  const hasHydratedFromLocalStorageRef = useRef(false);
   const previewFrameRef = useRef<HTMLDivElement | null>(null);
   const zoneBoxRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -101,6 +113,128 @@ export default function Konfigurator() {
     : undefined;
   const hasReachedZoneLimit = zones.length >= MAX_ZONES_PER_WORKWEAR_IMAGE;
   const activeWorkwearImage = WORKWEAR_IMAGES[activeWorkwearIndex];
+
+  useEffect(() => {
+    try {
+      const rawState = window.localStorage.getItem(WORKWEAR_STATE_STORAGE_KEY);
+      if (!rawState) return;
+
+      const parsedState: unknown = JSON.parse(rawState);
+      if (!isObjectRecord(parsedState)) return;
+
+      const activeIndexCandidate = parsedState.activeWorkwearIndex;
+      const activeIndex =
+        typeof activeIndexCandidate === "number" &&
+        Number.isInteger(activeIndexCandidate) &&
+        activeIndexCandidate >= 0 &&
+        activeIndexCandidate < WORKWEAR_IMAGES.length
+          ? activeIndexCandidate
+          : DEFAULT_WORKWEAR_INDEX;
+
+      const restoredStore: Record<number, WorkwearZoneState> = {};
+      const storeCandidate = parsedState.workwearStateByIndex;
+
+      if (isObjectRecord(storeCandidate)) {
+        for (const [indexKey, rawEntry] of Object.entries(storeCandidate)) {
+          const index = Number(indexKey);
+          if (
+            !Number.isInteger(index) ||
+            index < 0 ||
+            index >= WORKWEAR_IMAGES.length
+          ) {
+            continue;
+          }
+
+          if (!isObjectRecord(rawEntry)) continue;
+
+          const zonesCandidate = rawEntry.zones;
+          if (!Array.isArray(zonesCandidate) || zonesCandidate.length === 0) {
+            continue;
+          }
+
+          const zones = zonesCandidate as ZoneRect[];
+          const selectedZoneCandidate = rawEntry.selectedZoneId;
+          const selectedZoneId =
+            typeof selectedZoneCandidate === "string"
+              ? selectedZoneCandidate
+              : zones[0].id;
+
+          const nextZoneIndexCandidate = rawEntry.nextZoneIndex;
+          const nextZoneIndex =
+            typeof nextZoneIndexCandidate === "number" &&
+            Number.isFinite(nextZoneIndexCandidate) &&
+            nextZoneIndexCandidate > 0
+              ? Math.floor(nextZoneIndexCandidate)
+              : 2;
+
+          // Uploaded logos are object URLs and do not survive reloads.
+          const zonesWithoutUploadedAssets = zones.map((zone) => ({
+            ...zone,
+            assetId: null,
+            rotation: 0,
+            artworkOffset: { x: 0, y: 0 },
+          }));
+
+          restoredStore[index] = snapshotWorkwearZoneState(
+            zonesWithoutUploadedAssets,
+            selectedZoneId,
+            nextZoneIndex,
+          );
+        }
+      }
+
+      if (Object.keys(restoredStore).length > 0) {
+        workwearStateRef.current = restoredStore;
+      }
+
+      const restoredState = getOrCreateWorkwearZoneState(
+        workwearStateRef.current,
+        activeIndex,
+      );
+      const validSelectedZoneId = getValidSelectedZoneId(
+        restoredState.zones,
+        restoredState.selectedZoneId,
+      );
+
+      setActiveWorkwearIndex(activeIndex);
+      setZones(restoredState.zones);
+      setSelectedZoneId(validSelectedZoneId);
+      zoneCounterRef.current = restoredState.nextZoneIndex;
+    } catch {
+      // Keep defaults if stored JSON is invalid.
+    } finally {
+      hasHydratedFromLocalStorageRef.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasHydratedFromLocalStorageRef.current) return;
+
+    workwearStateRef.current[activeWorkwearIndex] = snapshotWorkwearZoneState(
+      zones,
+      selectedZoneId,
+      zoneCounterRef.current,
+    );
+
+    const stateByIndex: Record<string, WorkwearZoneState> = {};
+    for (const [index, state] of Object.entries(workwearStateRef.current)) {
+      stateByIndex[index] = state;
+    }
+
+    const payload: PersistedWorkwearState = {
+      activeWorkwearIndex,
+      workwearStateByIndex: stateByIndex,
+    };
+
+    try {
+      window.localStorage.setItem(
+        WORKWEAR_STATE_STORAGE_KEY,
+        JSON.stringify(payload),
+      );
+    } catch {
+      // Ignore write failures in private mode or quota limits.
+    }
+  }, [activeWorkwearIndex, selectedZoneId, zones]);
 
   useEffect(() => {
     const urls = urlsRef.current;

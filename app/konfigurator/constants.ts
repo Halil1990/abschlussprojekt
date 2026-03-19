@@ -1,12 +1,19 @@
+const STORAGE_BASE_URL = (process.env.NEXT_PUBLIC_WORKWEAR_BASE_URL || '').replace(/\/+$/, '');
+
 const buildImageSequence = (
   folder: 'jacke' | 'hose',
   articleNumber: '1250' | '2850',
 ) =>
-  Array.from(
-    { length: 24 },
-    (_, index) =>
-      `/${folder}/${articleNumber}-${String(index + 1).padStart(2, '0')}.jpg`,
-  );
+  Array.from({ length: 24 }, (_, index) => {
+    const fileName =
+      articleNumber + '-' + String(index + 1).padStart(2, '0') + '.jpg';
+    const relativePath = folder + '/' + fileName;
+
+    // Uses Supabase Storage when env var is set, otherwise falls back to local /public paths.
+    return STORAGE_BASE_URL
+      ? STORAGE_BASE_URL + '/' + relativePath
+      : '/' + relativePath;
+  });
 
 export const WORKWEAR_IMAGES: readonly string[] = [
   ...buildImageSequence('jacke', '1250'),
