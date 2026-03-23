@@ -9,10 +9,8 @@ const buildImageSequence = (
       articleNumber + '-' + String(index + 1).padStart(2, '0') + '.jpg';
     const relativePath = folder + '/' + fileName;
 
-    // Uses Supabase Storage when env var is set, otherwise falls back to local /public paths.
-    return STORAGE_BASE_URL
-      ? STORAGE_BASE_URL + '/' + relativePath
-      : '/' + relativePath;
+    // Uses Supabase Storage exclusively
+    return STORAGE_BASE_URL + '/' + relativePath;
   });
 
 export const WORKWEAR_IMAGES: readonly string[] = [
