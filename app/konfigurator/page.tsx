@@ -25,7 +25,7 @@ import WorkwearZone from "./components/WorkwearZone";
 import UploadModal from "./components/UploadModal";
 import {
   DEFAULT_WORKWEAR_INDEX,
-  MAX_ZONES_PER_WORKWEAR_IMAGE,
+  getMaxZonesForImage,
   WORKWEAR_IMAGES,
   INITIAL_ZONE_RECT,
   PREVIEW_DROP_ID,
@@ -124,7 +124,8 @@ export default function Konfigurator() {
   const selectedAsset = selectedZone?.assetId
     ? assetMap.get(selectedZone.assetId)
     : undefined;
-  const hasReachedZoneLimit = zones.length >= MAX_ZONES_PER_WORKWEAR_IMAGE;
+  const maxZonesForCurrentImage = getMaxZonesForImage(activeWorkwearIndex);
+  const hasReachedZoneLimit = zones.length >= maxZonesForCurrentImage;
   const activeWorkwearImage = WORKWEAR_IMAGES[activeWorkwearIndex];
 
   useEffect(() => {
@@ -331,6 +332,7 @@ export default function Konfigurator() {
   }
 
   function getNextAvailableZoneIndex() {
+    const maxZones = getMaxZonesForImage(activeWorkwearIndex);
     const usedIndexes = new Set(
       zones
         .map((zone) => {
@@ -340,7 +342,7 @@ export default function Konfigurator() {
         .filter((index): index is number => index !== null),
     );
 
-    for (let index = 1; index <= MAX_ZONES_PER_WORKWEAR_IMAGE; index += 1) {
+    for (let index = 1; index <= maxZones; index += 1) {
       if (!usedIndexes.has(index)) return index;
     }
 
@@ -678,7 +680,7 @@ export default function Konfigurator() {
                   Drop oder Klick zuweisen.
                 </p>
                 <p className="mt-1 text-xs text-white/50">
-                  Zonen pro Bild: {zones.length} / {MAX_ZONES_PER_WORKWEAR_IMAGE}
+                  Zonen pro Bild: {zones.length} / {maxZonesForCurrentImage}
                 </p>
 
                 <button
