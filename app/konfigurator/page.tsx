@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
+  type WheelEvent as ReactWheelEvent,
 } from "react";
 import {
   DndContext,
@@ -21,14 +22,17 @@ import {
 import Navbar from "../../components/layout/Navbar";
 import Footer from "../../components/layout/Footer";
 import DraggableAssetCard from "./components/DraggableAssetCard";
+import ProductSelectionSection from "./components/ProductSelectionSection";
 import WorkwearZone from "./components/WorkwearZone";
 import UploadModal from "./components/UploadModal";
 import {
   DEFAULT_WORKWEAR_INDEX,
   getMaxZonesForImage,
+  WORKWEAR_VIEWS_PER_PRODUCT,
   WORKWEAR_IMAGES,
   INITIAL_ZONE_RECT,
   PREVIEW_DROP_ID,
+  type WorkwearProductId,
   ZONE_DROP_PREFIX,
 } from "./constants";
 import type {
@@ -45,6 +49,12 @@ import {
   getArtworkTransform,
   maxPanForZoom,
 } from "./utils";
+import {
+  getWorkwearProductByIndex,
+  getWorkwearProductStartIndex,
+  getWorkwearSideLabel,
+  getWorkwearProductShortLabel,
+} from "./productHelpers";
 import {
   createInitialWorkwearZoneState,
   getOrCreateWorkwearZoneState,
@@ -64,17 +74,6 @@ type PersistedWorkwearState = {
 
 function isObjectRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
-}
-
-function getWorkwearSideLabel(imageUrl: string): string {
-  const normalizedUrl = imageUrl.split("?")[0]?.toLowerCase() ?? "";
-
-  if (normalizedUrl.endsWith("/vorne.jpg")) return "Vorne";
-  if (normalizedUrl.endsWith("/links.jpg")) return "Links";
-  if (normalizedUrl.endsWith("/rechts.jpg")) return "Rechts";
-  if (normalizedUrl.endsWith("/hinten.jpg")) return "Hinten";
-
-  return "Ansicht";
 }
 
 export default function Konfigurator() {
@@ -97,6 +96,7 @@ export default function Konfigurator() {
   const [viewPanDrag, setViewPanDrag] = useState<PanDragState | null>(null);
   const [zoneDrag, setZoneDrag] = useState<ZoneDragState | null>(null);
   const [artworkDrag, setArtworkDrag] = useState<ArtworkDragState | null>(null);
+  const [hasStartedConfigurator, setHasStartedConfigurator] = useState(false);
   const [isPreparingDraft, setIsPreparingDraft] = useState(false);
   const [draftPreparationError, setDraftPreparationError] = useState("");
   const [draftPreparationSuccess, setDraftPreparationSuccess] = useState("");
@@ -130,6 +130,15 @@ export default function Konfigurator() {
   const selectedAsset = selectedZone?.assetId
     ? assetMap.get(selectedZone.assetId)
     : undefined;
+  const activeProduct = getWorkwearProductByIndex(activeWorkwearIndex);
+  const productImageIndexes = useMemo(() => {
+    const startIndex = getWorkwearProductStartIndex(activeProduct);
+
+    return Array.from(
+      { length: WORKWEAR_VIEWS_PER_PRODUCT },
+      (_, offset) => startIndex + offset,
+    );
+  }, [activeProduct]);
   const maxZonesForCurrentImage = getMaxZonesForImage(activeWorkwearIndex);
   const activeWorkwearImage = WORKWEAR_IMAGES[activeWorkwearIndex];
 
@@ -252,9 +261,8 @@ export default function Konfigurator() {
   }, [activeWorkwearIndex, selectedZoneId, zones]);
 
   useEffect(() => {
-    if (activeWorkwearIndex !== DEFAULT_WORKWEAR_INDEX) return;
     thumbnailStripRef.current?.scrollTo({ left: 0 });
-  }, [activeWorkwearIndex]);
+  }, [activeProduct]);
 
   useEffect(() => {
     const urls = urlsRef.current;
@@ -379,35 +387,27 @@ export default function Konfigurator() {
     });
   }
 
-  useEffect(() => {
-    const frame = previewFrameRef.current;
-    if (!frame) return;
-
-    const handleWheel = (event: WheelEvent) => {
+  function handlePreviewWheel(event: ReactWheelEvent<HTMLDivElement>) {
+    if (event.cancelable) {
       event.preventDefault();
+    }
+    event.stopPropagation();
 
-      const zoomStep = event.shiftKey ? 0.2 : 0.1;
-      const zoomDelta = event.deltaY < 0 ? zoomStep : -zoomStep;
+    const zoomStep = event.shiftKey ? 0.2 : 0.1;
+    const zoomDelta = event.deltaY < 0 ? zoomStep : -zoomStep;
 
-      setViewZoom((previousZoom) => {
-        const zoom = Number(clamp(previousZoom + zoomDelta, 1, 2.5).toFixed(1));
-        const maxPan = maxPanForZoom(zoom);
+    setViewZoom((previousZoom) => {
+      const zoom = Number(clamp(previousZoom + zoomDelta, 1, 2.5).toFixed(1));
+      const maxPan = maxPanForZoom(zoom);
 
-        setViewPan((previousPan) => ({
-          x: Number(clamp(previousPan.x, -maxPan, maxPan).toFixed(1)),
-          y: Number(clamp(previousPan.y, -maxPan, maxPan).toFixed(1)),
-        }));
+      setViewPan((previousPan) => ({
+        x: Number(clamp(previousPan.x, -maxPan, maxPan).toFixed(1)),
+        y: Number(clamp(previousPan.y, -maxPan, maxPan).toFixed(1)),
+      }));
 
-        return zoom;
-      });
-    };
-
-    frame.addEventListener("wheel", handleWheel, { passive: false });
-
-    return () => {
-      frame.removeEventListener("wheel", handleWheel);
-    };
-  }, []);
+      return zoom;
+    });
+  }
 
   function handleViewPanStart(event: ReactPointerEvent<HTMLDivElement>) {
     if (viewZoom <= 1 || event.button !== 0) return;
@@ -509,6 +509,43 @@ export default function Konfigurator() {
     setActiveWorkwearIndex(nextIndex);
     resetView();
   }
+
+  function startConfiguratorForProduct(product: WorkwearProductId) {
+    setHasStartedConfigurator(true);
+    const targetIndex = getWorkwearProductStartIndex(product);
+    selectWorkwearImage(targetIndex);
+  }
+
+  function backToProductSelection() {
+    setHasStartedConfigurator(false);
+    resetView();
+  }
+
+  useEffect(() => {
+    const applyHashSelectionState = () => {
+      if (window.location.hash === "#auswahl") {
+        setHasStartedConfigurator(false);
+        resetView();
+      }
+    };
+
+    const handleSelectionEvent = () => {
+      setHasStartedConfigurator(false);
+      resetView();
+    };
+
+    applyHashSelectionState();
+    window.addEventListener("hashchange", applyHashSelectionState);
+    window.addEventListener("konfigurator:show-selection", handleSelectionEvent);
+
+    return () => {
+      window.removeEventListener("hashchange", applyHashSelectionState);
+      window.removeEventListener(
+        "konfigurator:show-selection",
+        handleSelectionEvent,
+      );
+    };
+  }, []);
 
   function clearZone(zoneId: string) {
     updateZone(zoneId, (zone) => ({
@@ -677,14 +714,22 @@ export default function Konfigurator() {
           <h1 className="text-center text-3xl font-bold text-white sm:text-4xl">
             Workwear Konfigurator Demo
           </h1>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-white/75">
-            Logos hochladen, direkt auf das Kleidungsstueck ziehen und die
-            Groesse je Zone anpassen.
-          </p>
-
+          {!hasStartedConfigurator ? (
+            <ProductSelectionSection
+              onStartConfigurator={startConfiguratorForProduct}
+            />
+          ) : (
           <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
             <div className="mt-8 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
               <aside className="rounded-3xl border border-white/15 bg-black/45 p-4 sm:p-5">
+                <button
+                  type="button"
+                  onClick={backToProductSelection}
+                  className="mb-3 w-full rounded-md bg-nordwerk-orange px-4 py-2 text-sm font-semibold text-black transition hover:opacity-90"
+                >
+                  ← Zur Produktauswahl
+                </button>
+
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-lg font-semibold text-white">Assets</h2>
                 </div>
@@ -851,36 +896,6 @@ export default function Konfigurator() {
                     </button>
                   </div>
 
-                  <p className="mt-2 text-xs text-white/50">
-                    Skalierung: {(selectedZone?.scale ?? 1).toFixed(1)}x
-                  </p>
-                  <p className="mt-1 text-xs text-white/50">
-                    Zonengroesse:{" "}
-                    {(selectedZone?.w ?? INITIAL_ZONE_RECT.w).toFixed(1)}%
-                  </p>
-                  <p className="mt-1 text-xs text-white/50">
-                    Kleidungszoom: {viewZoom.toFixed(1)}x
-                  </p>
-                  <p className="mt-1 text-xs text-white/50">
-                    Produktbild: {activeWorkwearIndex + 1} /{" "}
-                    {WORKWEAR_IMAGES.length}
-                  </p>
-                  <p className="mt-1 text-xs text-white/50">
-                    Zoom: Mausrad ueber der Vorschau (Shift = groessere
-                    Schritte)
-                  </p>
-                  <p className="mt-1 text-xs text-white/50">
-                    Ansicht (X/Y): {viewPan.x.toFixed(1)} /{" "}
-                    {viewPan.y.toFixed(1)}
-                  </p>
-                  <p className="mt-1 text-xs text-white/50">
-                    Ansicht bewegen: Linksklick gedrueckt halten und ziehen.
-                  </p>
-                  <p className="mt-1 text-xs text-white/50">
-                    Zone verschieben: Griff ziehen. Logo verschieben: Logo in
-                    der jeweiligen Zone ziehen.
-                  </p>
-
                   <button
                     type="button"
                     onClick={() => setPreviewOnly((previous) => !previous)}
@@ -939,7 +954,9 @@ export default function Konfigurator() {
                           setPreviewDropRef(node);
                         }}
                         className={`relative mx-auto w-full overflow-hidden ${viewZoom > 1 ? (viewPanDrag ? "cursor-grabbing" : "cursor-grab") : ""}`}
-                        style={{ aspectRatio: "768 / 1320" }}
+                        style={{ aspectRatio: "768 / 1320", overscrollBehavior: "contain" }}
+                        onWheelCapture={handlePreviewWheel}
+                        onWheel={handlePreviewWheel}
                         onPointerDown={handleViewPanStart}
                         onPointerMove={handleViewPanMove}
                         onPointerUp={handleViewPanEnd}
@@ -953,7 +970,7 @@ export default function Konfigurator() {
                         >
                           <img
                             src={activeWorkwearImage}
-                            alt="Workwear Shirt"
+                            alt={`Workwear ${getWorkwearProductShortLabel(activeProduct)}`}
                             className="pointer-events-none select-none object-contain absolute inset-0 h-full w-full"
                           />
 
@@ -1020,7 +1037,10 @@ export default function Konfigurator() {
                       {/* Thumbnail Gallery */}
                       <div className="flex justify-center">
                         <div ref={thumbnailStripRef} className="flex w-fit gap-2 overflow-x-auto pb-2">
-                          {WORKWEAR_IMAGES.map((imageUrl, index) => (
+                          {productImageIndexes.map((index) => {
+                            const imageUrl = WORKWEAR_IMAGES[index];
+
+                            return (
                             <div key={index} className="shrink-0">
                             <button
                               type="button"
@@ -1031,11 +1051,11 @@ export default function Konfigurator() {
                                   : 'border-white/20 hover:border-white/40'
                               }`}
                               style={{ width: '62px', height: '92px', aspectRatio: '768 / 1366' }}
-                              aria-label={`Bild ${index + 1} ${getWorkwearSideLabel(imageUrl)}`}
+                              aria-label={`${getWorkwearProductShortLabel(activeProduct)} ${getWorkwearSideLabel(imageUrl)}`}
                             >
                               <img
                                 src={imageUrl}
-                                alt={`Thumbnail ${index + 1}`}
+                                alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
                                 className="h-full w-full object-cover"
                               />
                             </button>
@@ -1043,7 +1063,7 @@ export default function Konfigurator() {
                               {getWorkwearSideLabel(imageUrl)}
                             </p>
                             </div>
-                          ))}
+                          );})}
                         </div>
                       </div>
                     </div>
@@ -1052,6 +1072,7 @@ export default function Konfigurator() {
               </section>
             </div>
           </DndContext>
+          )}
         </div>
       </main>
       <Footer />

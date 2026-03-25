@@ -33,8 +33,11 @@ export default function Navbar() {
   };
 
   const goToKonfigurator = () => {
-    if (pathname !== '/konfigurator') {
-      router.push('/konfigurator');
+    if (pathname === '/konfigurator') {
+      window.dispatchEvent(new CustomEvent('konfigurator:show-selection'));
+      window.location.hash = 'auswahl';
+    } else {
+      router.push('/konfigurator#auswahl');
     }
     setMenuOpen(false);
   };

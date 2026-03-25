@@ -7,7 +7,37 @@ const WORKWEAR_VIEW_FILENAMES = [
   'rechts.jpg',
 ] as const;
 
-const buildImageSequence = (folder: 'jacke' | 'hose') =>
+export const WORKWEAR_PRODUCTS = [
+  {
+    id: 'jacke',
+    label: 'Jacke',
+    shortLabel: 'Jacke',
+    folder: 'jacke',
+  },
+  {
+    id: 'hose',
+    label: 'Hose',
+    shortLabel: 'Hose',
+    folder: 'hose',
+  },
+  {
+    id: 'latzhose',
+    label: 'Latzhose',
+    shortLabel: 'Latzhose',
+    folder: 'latzhose',
+  },
+  {
+    id: 'weste',
+    label: 'Weste',
+    shortLabel: 'Weste',
+    folder: 'weste',
+  },
+] as const;
+
+export type WorkwearProductId = (typeof WORKWEAR_PRODUCTS)[number]['id'];
+export const WORKWEAR_VIEWS_PER_PRODUCT = WORKWEAR_VIEW_FILENAMES.length;
+
+const buildImageSequence = (folder: string) =>
   WORKWEAR_VIEW_FILENAMES.map((fileName) => {
     const relativePath = folder + '/' + fileName;
     const baseUrl = STORAGE_BASE_URL + '/' + relativePath;
@@ -16,13 +46,8 @@ const buildImageSequence = (folder: 'jacke' | 'hose') =>
     return IMAGE_VERSION ? baseUrl + '?v=' + IMAGE_VERSION : baseUrl;
   });
 
-const WORKWEAR_JACKE_IMAGES = buildImageSequence('jacke');
-const WORKWEAR_HOSE_IMAGES = buildImageSequence('hose');
-
-
 export const WORKWEAR_IMAGES: readonly string[] = [
-  ...WORKWEAR_JACKE_IMAGES,
-  ...WORKWEAR_HOSE_IMAGES,
+  ...WORKWEAR_PRODUCTS.flatMap((product) => buildImageSequence(product.folder)),
 ];
 export const DEFAULT_WORKWEAR_INDEX = 0;
 
@@ -30,17 +55,9 @@ export const PREVIEW_DROP_ID = 'preview-drop';
 export const ZONE_DROP_PREFIX = 'zone:';
 
 // Maximale Zonen pro Bild-Index
-// Indices: 0-3 = Jacke (vorne, hinten, links, rechts), 4-7 = Hose (vorne, hinten, links, rechts)
-export const MAX_ZONES_PER_IMAGE: readonly number[] = [
-  2, // Index 0: Jacke vorne
-  2, // Index 1: Jacke hinten
-  2, // Index 2: Jacke links
-  2, // Index 3: Jacke rechts
-  2, // Index 4: Hose vorne
-  2, // Index 5: Hose hinten
-  2, // Index 6: Hose links
-  2, // Index 7: Hose rechts
-];
+export const MAX_ZONES_PER_IMAGE: readonly number[] = WORKWEAR_IMAGES.map(
+  () => 2,
+);
 
 export function getMaxZonesForImage(imageIndex: number): number {
   return MAX_ZONES_PER_IMAGE[imageIndex] ?? 2;
