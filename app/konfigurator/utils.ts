@@ -5,10 +5,6 @@ export function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
-export function clampScale(scale: number) {
-  return Number(clamp(scale, 0.4, 2.4).toFixed(1));
-}
-
 export function clampZoneWidth(width: number) {
   return Number(clamp(width, 8, 15).toFixed(1));
 }
@@ -36,10 +32,6 @@ export function createZone(index: number): ZoneRect {
     assetId: null,
     artworkOffset: { x: 0, y: 0 },
   };
-}
-
-export function maxPanForZoom(zoom: number) {
-  return (zoom - 1) * 45;
 }
 
 export function getArtworkTransform(zone: Pick<ZoneRect, 'artworkOffset' | 'rotation' | 'scale'>) {
