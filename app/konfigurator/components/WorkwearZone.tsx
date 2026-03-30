@@ -12,13 +12,9 @@ type WorkwearZoneProps = {
   previewIsOver: boolean;
   zoneDropPrefix: string;
   onSelect: (zoneId: string) => void;
-  onRegisterNode: (zoneId: string, node: HTMLDivElement | null) => void;
-  onZoneDragStart: (event: ReactPointerEvent<HTMLButtonElement>, zoneId: string) => void;
-  onZoneDragMove: (event: ReactPointerEvent<HTMLButtonElement>) => void;
-  onZoneDragEnd: (event: ReactPointerEvent<HTMLButtonElement>) => void;
-  onArtworkDragStart: (event: ReactPointerEvent<HTMLButtonElement>, zoneId: string) => void;
-  onArtworkDragMove: (event: ReactPointerEvent<HTMLButtonElement>) => void;
-  onArtworkDragEnd: (event: ReactPointerEvent<HTMLButtonElement>) => void;
+  onZoneDragStart: (event: ReactPointerEvent<HTMLDivElement>, zoneId: string) => void;
+  onZoneDragMove: (event: ReactPointerEvent<HTMLDivElement>) => void;
+  onZoneDragEnd: (event: ReactPointerEvent<HTMLDivElement>) => void;
 };
 
 export default function WorkwearZone({
@@ -28,13 +24,9 @@ export default function WorkwearZone({
   previewIsOver,
   zoneDropPrefix,
   onSelect,
-  onRegisterNode,
   onZoneDragStart,
   onZoneDragMove,
   onZoneDragEnd,
-  onArtworkDragStart,
-  onArtworkDragMove,
-  onArtworkDragEnd,
 }: WorkwearZoneProps) {
   const { isOver, setNodeRef } = useDroppable({ id: zoneDropPrefix + zone.id });
 
@@ -42,9 +34,12 @@ export default function WorkwearZone({
     <div
       ref={(node) => {
         setNodeRef(node);
-        onRegisterNode(zone.id, node);
       }}
       onClick={() => onSelect(zone.id)}
+      onPointerDown={(event) => onZoneDragStart(event, zone.id)}
+      onPointerMove={onZoneDragMove}
+      onPointerUp={onZoneDragEnd}
+      onPointerCancel={onZoneDragEnd}
       style={{
         left: zone.x + '%',
         top: zone.y + '%',
@@ -52,7 +47,7 @@ export default function WorkwearZone({
         height: zone.h + '%',
       }}
       className={
-        'absolute rounded-md border transition ' +
+        'absolute touch-none rounded-md border transition ' +
         (isOver || previewIsOver
           ? 'border-nordwerk-orange bg-nordwerk-orange/20 shadow-[0_0_0_1px_rgba(0,0,0,0.95),0_0_0_2px_rgba(255,255,255,0.95),0_0_0_4px_rgba(245,130,32,0.55)]'
           : isSelected
@@ -60,17 +55,6 @@ export default function WorkwearZone({
           : 'border-black/85 bg-black/12 shadow-[0_0_0_1px_rgba(0,0,0,0.9),0_0_0_2px_rgba(255,255,255,0.9)]')
       }
     >
-      <button
-        type="button"
-        onPointerDown={(event) => onZoneDragStart(event, zone.id)}
-        onPointerMove={onZoneDragMove}
-        onPointerUp={onZoneDragEnd}
-        onPointerCancel={onZoneDragEnd}
-        className="absolute left-0 top-0 z-30 -translate-y-[115%] touch-none rounded bg-black/85 px-2 py-1 text-[10px] font-medium uppercase tracking-[0.08em] text-white shadow"
-      >
-        Zone
-      </button>
-
       <div className="relative h-full w-full overflow-hidden rounded-[inherit]">
 
       {!asset ? (
@@ -80,15 +64,7 @@ export default function WorkwearZone({
           </span>
         </div>
       ) : (
-        <button
-          type="button"
-          onPointerDown={(event) => onArtworkDragStart(event, zone.id)}
-          onPointerMove={onArtworkDragMove}
-          onPointerUp={onArtworkDragEnd}
-          onPointerCancel={onArtworkDragEnd}
-          className="absolute inset-0 z-20 touch-none cursor-grab active:cursor-grabbing"
-          aria-label={`${zone.label} logo verschieben`}
-        >
+        <div className="absolute inset-0 z-20">
           <img
             src={asset.src}
             alt={asset.name}
@@ -98,7 +74,7 @@ export default function WorkwearZone({
               transformOrigin: 'center',
             }}
           />
-        </button>
+        </div>
       )}
       </div>
     </div>

@@ -20,21 +20,21 @@ export const WORKWEAR_PRODUCTS = [
     label: 'Hose',
     shortLabel: 'Hose',
     folder: 'hose',
-    imageExtension: 'jpg',
+    imageExtension: 'png',
   },
   {
     id: 'latzhose',
     label: 'Latzhose',
     shortLabel: 'Latzhose',
     folder: 'latzhose',
-    imageExtension: 'jpg',
+    imageExtension: 'png',
   },
   {
     id: 'weste',
     label: 'Weste',
     shortLabel: 'Weste',
     folder: 'weste',
-    imageExtension: 'jpg',
+    imageExtension: 'png',
   },
 ] as const;
 

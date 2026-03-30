@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
-  type WheelEvent as ReactWheelEvent,
 } from "react";
 import {
   DndContext,
@@ -37,17 +36,13 @@ import {
 } from "./constants";
 import type {
   Asset,
-  ArtworkDragState,
-  PanDragState,
   ZoneDragState,
   ZoneRect,
 } from "./types";
 import {
   clamp,
-  clampScale,
   clampZoneWidth,
   getArtworkTransform,
-  maxPanForZoom,
 } from "./utils";
 import {
   getWorkwearProductByIndex,
@@ -91,11 +86,7 @@ export default function Konfigurator() {
     DEFAULT_WORKWEAR_INDEX,
   );
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [viewZoom, setViewZoom] = useState(1);
-  const [viewPan, setViewPan] = useState({ x: 0, y: 0 });
-  const [viewPanDrag, setViewPanDrag] = useState<PanDragState | null>(null);
   const [zoneDrag, setZoneDrag] = useState<ZoneDragState | null>(null);
-  const [artworkDrag, setArtworkDrag] = useState<ArtworkDragState | null>(null);
   const [hasStartedConfigurator, setHasStartedConfigurator] = useState(false);
   const [isPreparingDraft, setIsPreparingDraft] = useState(false);
   const [draftPreparationError, setDraftPreparationError] = useState("");
@@ -109,7 +100,6 @@ export default function Konfigurator() {
   });
   const hasHydratedFromLocalStorageRef = useRef(false);
   const previewFrameRef = useRef<HTMLDivElement | null>(null);
-  const zoneBoxRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const thumbnailStripRef = useRef<HTMLDivElement | null>(null);
 
   const sensors = useSensors(
@@ -397,10 +387,6 @@ export default function Konfigurator() {
     }));
   }
 
-  function updateScale(nextScale: number) {
-    updateSelectedZone((zone) => ({ ...zone, scale: clampScale(nextScale) }));
-  }
-
   function rotateArtwork(degrees: number) {
     updateSelectedZone((zone) => ({
       ...zone,
@@ -421,83 +407,6 @@ export default function Konfigurator() {
         y: clamp(zone.y, 0, 100 - height),
       };
     });
-  }
-
-  function handlePreviewWheel(event: ReactWheelEvent<HTMLDivElement>) {
-    if (event.cancelable) {
-      event.preventDefault();
-    }
-    event.stopPropagation();
-
-    const zoomStep = event.shiftKey ? 0.2 : 0.1;
-    const zoomDelta = event.deltaY < 0 ? zoomStep : -zoomStep;
-
-    setViewZoom((previousZoom) => {
-      const zoom = Number(clamp(previousZoom + zoomDelta, 1, 2.5).toFixed(1));
-      const maxPan = maxPanForZoom(zoom);
-
-      setViewPan((previousPan) => ({
-        x: Number(clamp(previousPan.x, -maxPan, maxPan).toFixed(1)),
-        y: Number(clamp(previousPan.y, -maxPan, maxPan).toFixed(1)),
-      }));
-
-      return zoom;
-    });
-  }
-
-  function handleViewPanStart(event: ReactPointerEvent<HTMLDivElement>) {
-    if (viewZoom <= 1 || event.button !== 0) return;
-
-    const target = event.target as HTMLElement;
-    if (target.closest("button, input, label, textarea, select, a")) return;
-
-    event.preventDefault();
-    event.currentTarget.setPointerCapture(event.pointerId);
-
-    setViewPanDrag({
-      pointerId: event.pointerId,
-      startPointerX: event.clientX,
-      startPointerY: event.clientY,
-      startPanX: viewPan.x,
-      startPanY: viewPan.y,
-    });
-  }
-
-  function handleViewPanMove(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!viewPanDrag || viewPanDrag.pointerId !== event.pointerId) return;
-
-    const frame = previewFrameRef.current;
-    if (!frame) return;
-
-    const bounds = frame.getBoundingClientRect();
-    if (bounds.width === 0 || bounds.height === 0) return;
-
-    const deltaXPct =
-      ((event.clientX - viewPanDrag.startPointerX) / bounds.width) * 100;
-    const deltaYPct =
-      ((event.clientY - viewPanDrag.startPointerY) / bounds.height) * 100;
-    const maxPan = maxPanForZoom(viewZoom);
-
-    setViewPan({
-      x: Number(
-        clamp(viewPanDrag.startPanX + deltaXPct, -maxPan, maxPan).toFixed(1),
-      ),
-      y: Number(
-        clamp(viewPanDrag.startPanY + deltaYPct, -maxPan, maxPan).toFixed(1),
-      ),
-    });
-  }
-
-  function handleViewPanEnd(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!viewPanDrag || viewPanDrag.pointerId !== event.pointerId) return;
-
-    event.currentTarget.releasePointerCapture(event.pointerId);
-    setViewPanDrag(null);
-  }
-
-  function resetView() {
-    setViewZoom(1);
-    setViewPan({ x: 0, y: 0 });
   }
 
   function saveCurrentWorkwearState(index: number) {
@@ -544,7 +453,6 @@ export default function Konfigurator() {
     saveCurrentWorkwearState(activeWorkwearIndex);
     loadWorkwearState(nextIndex);
     setActiveWorkwearIndex(nextIndex);
-    resetView();
   }
 
   function startConfiguratorForProduct(product: WorkwearProductId) {
@@ -564,7 +472,6 @@ export default function Konfigurator() {
 
   function backToProductSelection() {
     setHasStartedConfigurator(false);
-    resetView();
   }
 
   useEffect(() => {
@@ -595,8 +502,6 @@ export default function Konfigurator() {
       setSelectedZoneId(validSelectedZoneId);
       zoneCounterRef.current = savedState.nextZoneIndex;
       setActiveWorkwearIndex(nextIndex);
-      setViewZoom(1);
-      setViewPan({ x: 0, y: 0 });
     };
 
     const fallbackInProduct = productImageIndexes.find((index) =>
@@ -623,13 +528,11 @@ export default function Konfigurator() {
     const applyHashSelectionState = () => {
       if (window.location.hash === "#auswahl") {
         setHasStartedConfigurator(false);
-        resetView();
       }
     };
 
     const handleSelectionEvent = () => {
       setHasStartedConfigurator(false);
-      resetView();
     };
 
     applyHashSelectionState();
@@ -655,7 +558,7 @@ export default function Konfigurator() {
   }
 
   function handleZoneDragStart(
-    event: ReactPointerEvent<HTMLButtonElement>,
+    event: ReactPointerEvent<HTMLDivElement>,
     zoneId: string,
   ) {
     const zone = zones.find((entry) => entry.id === zoneId);
@@ -676,7 +579,7 @@ export default function Konfigurator() {
     });
   }
 
-  function handleZoneDragMove(event: ReactPointerEvent<HTMLButtonElement>) {
+  function handleZoneDragMove(event: ReactPointerEvent<HTMLDivElement>) {
     if (!zoneDrag || zoneDrag.pointerId !== event.pointerId) return;
 
     const frame = previewFrameRef.current;
@@ -690,9 +593,6 @@ export default function Konfigurator() {
     const deltaYPct =
       ((event.clientY - zoneDrag.startPointerY) / bounds.height) * 100;
 
-    const dragHandleHeight = event.currentTarget.getBoundingClientRect().height;
-    const topHandleClearancePct = (dragHandleHeight * 1.15 * 100) / bounds.height;
-
     updateZone(zoneDrag.zoneId, (zone) => {
       const maxX = 100 - zone.w;
       const maxY = 100 - zone.h;
@@ -700,70 +600,15 @@ export default function Konfigurator() {
       return {
         ...zone,
         x: clamp(zoneDrag.startZoneX + deltaXPct, 0, maxX),
-        y: clamp(zoneDrag.startZoneY + deltaYPct, topHandleClearancePct, maxY),
+        y: clamp(zoneDrag.startZoneY + deltaYPct, 0, maxY),
       };
     });
   }
 
-  function handleZoneDragEnd(event: ReactPointerEvent<HTMLButtonElement>) {
+  function handleZoneDragEnd(event: ReactPointerEvent<HTMLDivElement>) {
     if (!zoneDrag || zoneDrag.pointerId !== event.pointerId) return;
     event.currentTarget.releasePointerCapture(event.pointerId);
     setZoneDrag(null);
-  }
-
-  function handleArtworkDragStart(
-    event: ReactPointerEvent<HTMLButtonElement>,
-    zoneId: string,
-  ) {
-    const zone = zones.find((entry) => entry.id === zoneId);
-    if (!zone || !zone.assetId) return;
-
-    event.preventDefault();
-    event.stopPropagation();
-    event.currentTarget.setPointerCapture(event.pointerId);
-    setSelectedZoneId(zoneId);
-
-    setArtworkDrag({
-      zoneId,
-      pointerId: event.pointerId,
-      startPointerX: event.clientX,
-      startPointerY: event.clientY,
-      startOffsetX: zone.artworkOffset.x,
-      startOffsetY: zone.artworkOffset.y,
-    });
-  }
-
-  function handleArtworkDragMove(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (!artworkDrag || artworkDrag.pointerId !== event.pointerId) return;
-
-    const zoneBounds =
-      zoneBoxRefs.current[artworkDrag.zoneId]?.getBoundingClientRect();
-    if (!zoneBounds) return;
-
-    const maxX = zoneBounds.width * 0.45;
-    const maxY = zoneBounds.height * 0.45;
-
-    const nextX = clamp(
-      artworkDrag.startOffsetX + (event.clientX - artworkDrag.startPointerX),
-      -maxX,
-      maxX,
-    );
-    const nextY = clamp(
-      artworkDrag.startOffsetY + (event.clientY - artworkDrag.startPointerY),
-      -maxY,
-      maxY,
-    );
-
-    updateZone(artworkDrag.zoneId, (zone) => ({
-      ...zone,
-      artworkOffset: { x: nextX, y: nextY },
-    }));
-  }
-
-  function handleArtworkDragEnd(event: ReactPointerEvent<HTMLButtonElement>) {
-    if (!artworkDrag || artworkDrag.pointerId !== event.pointerId) return;
-    event.currentTarget.releasePointerCapture(event.pointerId);
-    setArtworkDrag(null);
   }
 
   async function prepareDraftAndOpenMainForm() {
@@ -925,41 +770,6 @@ export default function Konfigurator() {
                       type="button"
                       className="h-9 w-9 rounded-md bg-white/10 text-white disabled:opacity-40"
                       onClick={() =>
-                        updateScale((selectedZone?.scale ?? 1) - 0.1)
-                      }
-                      disabled={!selectedAsset}
-                    >
-                      -
-                    </button>
-                    <input
-                      type="range"
-                      min={0.4}
-                      max={2.4}
-                      step={0.1}
-                      value={selectedZone?.scale ?? 1}
-                      onChange={(event) =>
-                        updateScale(Number(event.target.value))
-                      }
-                      disabled={!selectedAsset}
-                      className="w-full accent-orange-400 disabled:opacity-40"
-                    />
-                    <button
-                      type="button"
-                      className="h-9 w-9 rounded-md bg-white/10 text-white disabled:opacity-40"
-                      onClick={() =>
-                        updateScale((selectedZone?.scale ?? 1) + 0.1)
-                      }
-                      disabled={!selectedAsset}
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <div className="mt-4 flex items-center gap-2">
-                    <button
-                      type="button"
-                      className="h-9 w-9 rounded-md bg-white/10 text-white disabled:opacity-40"
-                      onClick={() =>
                         updateZoneSize(
                           (selectedZone?.w ?? INITIAL_ZONE_RECT.w) - 1,
                         )
@@ -1002,13 +812,6 @@ export default function Konfigurator() {
                     {previewOnly ? "Bearbeitung anzeigen" : "Nur Bild anzeigen"}
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={resetView}
-                    className="mt-3 w-full rounded-md border border-white/25 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-white/15"
-                  >
-                    Ansicht zentrieren
-                  </button>
                 </div>
 
                 <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4">
@@ -1051,20 +854,12 @@ export default function Konfigurator() {
                           previewFrameRef.current = node;
                           setPreviewDropRef(node);
                         }}
-                        className={`relative mx-auto w-full overflow-hidden ${viewZoom > 1 ? (viewPanDrag ? "cursor-grabbing" : "cursor-grab") : ""}`}
+                        className="relative mx-auto w-full overflow-hidden"
                         style={{ aspectRatio: "768 / 1320", overscrollBehavior: "contain" }}
-                        onWheelCapture={handlePreviewWheel}
-                        onWheel={handlePreviewWheel}
-                        onPointerDown={handleViewPanStart}
-                        onPointerMove={handleViewPanMove}
-                        onPointerUp={handleViewPanEnd}
-                        onPointerCancel={handleViewPanEnd}
                       >
                         <div
                           className="absolute inset-0 origin-center transition-transform duration-200"
-                          style={{
-                            transform: `translate(${viewPan.x}%, ${viewPan.y}%) scale(${viewZoom})`,
-                          }}
+                          style={{ transform: "none" }}
                         >
                           <img
                             src={activeWorkwearImage}
@@ -1118,15 +913,9 @@ export default function Konfigurator() {
                                   }
                                   zoneDropPrefix={ZONE_DROP_PREFIX}
                                   onSelect={setSelectedZoneId}
-                                  onRegisterNode={(zoneId, node) => {
-                                    zoneBoxRefs.current[zoneId] = node;
-                                  }}
                                   onZoneDragStart={handleZoneDragStart}
                                   onZoneDragMove={handleZoneDragMove}
                                   onZoneDragEnd={handleZoneDragEnd}
-                                  onArtworkDragStart={handleArtworkDragStart}
-                                  onArtworkDragMove={handleArtworkDragMove}
-                                  onArtworkDragEnd={handleArtworkDragEnd}
                                 />
                               ))}
                         </div>

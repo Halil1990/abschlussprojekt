@@ -30,20 +30,3 @@ export type ZoneDragState = {
   startZoneX: number;
   startZoneY: number;
 };
-
-export type ArtworkDragState = {
-  zoneId: string;
-  pointerId: number;
-  startPointerX: number;
-  startPointerY: number;
-  startOffsetX: number;
-  startOffsetY: number;
-};
-
-export type PanDragState = {
-  pointerId: number;
-  startPointerX: number;
-  startPointerY: number;
-  startPanX: number;
-  startPanY: number;
-};
