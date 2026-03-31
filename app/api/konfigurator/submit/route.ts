@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { runRequestGuards } from "../../_lib/requestGuards";
 
 type ContactPayload = {
   name: string;
@@ -22,6 +23,10 @@ type SubmitPayload = {
   printMaterial?: "druck" | "strick";
 };
 
+const MAX_SNAPSHOTS = 12;
+const MAX_SINGLE_SNAPSHOT_BYTES = 12 * 1024 * 1024;
+const MAX_TOTAL_SNAPSHOT_BYTES = 48 * 1024 * 1024;
+
 function escapeHtml(value: string) {
   return value
     .replace(/&/g, "&amp;")
@@ -42,6 +47,55 @@ function parseDataUrl(dataUrl: string) {
   const bytes = Buffer.from(match[2], "base64");
 
   return { mime, extension, bytes };
+}
+
+function estimateBase64Bytes(base64Payload: string) {
+  const padding = base64Payload.endsWith("==") ? 2 : base64Payload.endsWith("=") ? 1 : 0;
+  return Math.floor((base64Payload.length * 3) / 4) - padding;
+}
+
+function validateSnapshotsPayload(snapshots: SnapshotPayload[]) {
+  if (!Array.isArray(snapshots) || snapshots.length === 0) {
+    return { error: "Mindestens ein konfiguriertes Bild ist erforderlich.", status: 400 };
+  }
+
+  if (snapshots.length > MAX_SNAPSHOTS) {
+    return {
+      error: `Zu viele Snapshots. Maximal ${MAX_SNAPSHOTS} erlaubt.`,
+      status: 413,
+    };
+  }
+
+  let totalBytes = 0;
+
+  for (const snapshot of snapshots) {
+    if (!Number.isInteger(snapshot?.imageIndex) || typeof snapshot?.dataUrl !== "string") {
+      return { error: "Snapshot-Format ist ungueltig.", status: 400 };
+    }
+
+    const match = /^data:(image\/(?:png|jpeg|jpg));base64,(.+)$/i.exec(snapshot.dataUrl);
+    if (!match) {
+      return { error: "Ungueltiges Bildformat im Snapshot.", status: 400 };
+    }
+
+    const estimatedBytes = estimateBase64Bytes(match[2]);
+    if (estimatedBytes > MAX_SINGLE_SNAPSHOT_BYTES) {
+      return {
+        error: "Ein Snapshot ist zu gross. Bitte kleinere Bilder verwenden.",
+        status: 413,
+      };
+    }
+
+    totalBytes += estimatedBytes;
+    if (totalBytes > MAX_TOTAL_SNAPSHOT_BYTES) {
+      return {
+        error: "Gesamtgroesse der Snapshots ist zu gross.",
+        status: 413,
+      };
+    }
+  }
+
+  return null;
 }
 
 async function uploadSnapshotToStorage(
@@ -204,6 +258,16 @@ async function sendNotificationMail(
 }
 
 export async function POST(req: Request) {
+  const guardResponse = runRequestGuards(req, {
+    routeKey: "konfigurator-submit",
+    windowMs: 10 * 60 * 1000,
+    maxRequests: 10,
+  });
+
+  if (guardResponse) {
+    return guardResponse;
+  }
+
   try {
     const supabaseUrl = process.env.SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -233,10 +297,11 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!Array.isArray(body.snapshots) || body.snapshots.length === 0) {
+    const snapshotValidation = validateSnapshotsPayload(body.snapshots);
+    if (snapshotValidation) {
       return NextResponse.json(
-        { error: "Mindestens ein konfiguriertes Bild ist erforderlich." },
-        { status: 400 },
+        { error: snapshotValidation.error },
+        { status: snapshotValidation.status },
       );
     }
 

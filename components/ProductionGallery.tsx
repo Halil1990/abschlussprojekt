@@ -124,7 +124,7 @@ export default function ProductionGallery() {
               return (
                 <div
                   key={card.title}
-                  className="w-full flex-shrink-0 px-4 sm:px-6"
+                  className="w-full shrink-0 px-4 sm:px-6"
                 >
                   <div
                     className={`max-w-md mx-auto bg-white/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 text-left flex flex-col border-2 transition-all duration-500 ${

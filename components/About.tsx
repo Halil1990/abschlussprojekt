@@ -39,7 +39,7 @@ export default function About() {
             </p>
           </div>
   
-          <div className="bg-white h-32 sm:h-48 md:h-64 rounded-2xl flex items-center justify-center overflow-hidden order-1 md:order-2 relative flex flex-row gap-4">
+          <div className="bg-white h-32 sm:h-48 md:h-64 rounded-2xl flex items-center justify-center overflow-hidden order-1 md:order-2 relative flex-row gap-4">
             <div className="flex-1 relative h-full">
               <Image
                 src="/schweißer.jpg"

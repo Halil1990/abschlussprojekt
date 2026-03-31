@@ -1,7 +1,18 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { runRequestGuards } from '../_lib/requestGuards';
 
 export async function POST(req: Request) {
+  const guardResponse = runRequestGuards(req, {
+    routeKey: 'contact',
+    windowMs: 10 * 60 * 1000,
+    maxRequests: 12,
+  });
+
+  if (guardResponse) {
+    return guardResponse;
+  }
+
   try {
     const { name, email, phone, message } = await req.json();
 
