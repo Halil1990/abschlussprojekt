@@ -19,6 +19,7 @@ type SubmitPayload = {
   activeWorkwearIndex: number;
   workwearStateByIndex: Record<string, unknown>;
   snapshots: SnapshotPayload[];
+  printMaterial?: "druck" | "strick";
 };
 
 function escapeHtml(value: string) {
@@ -157,6 +158,7 @@ async function sendNotificationMail(
   requestId: string,
   contact: ContactPayload,
   snapshotUrls: string[],
+  printMaterial?: string,
 ) {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -175,6 +177,10 @@ async function sendNotificationMail(
         .join("")}</ul>`
     : "<p>Keine Snapshot-Links vorhanden.</p>";
 
+  const printMaterialHtml = printMaterial
+    ? `<p><strong>Druckmaterial:</strong> ${escapeHtml(printMaterial === "druck" ? "Druck" : "Strick")}</p>`
+    : "";
+
   await transporter.sendMail({
     from: `"Nordwerk Konfigurator" <${process.env.SMTP_USER}>`,
     to: process.env.CONTACT_EMAIL || "a.knoth@k-k-solutions.de",
@@ -186,6 +192,7 @@ async function sendNotificationMail(
       <p><strong>Name:</strong> ${escapeHtml(contact.name)}</p>
       <p><strong>E-Mail:</strong> ${escapeHtml(contact.email)}</p>
       <p><strong>Telefon:</strong> ${escapeHtml(contact.phone || "Nicht angegeben")}</p>
+      ${printMaterialHtml}
       <hr />
       <p><strong>Nachricht:</strong></p>
       <p>${safeMessage || "Keine Nachricht"}</p>
@@ -265,7 +272,10 @@ export async function POST(req: Request) {
       phone: body.contact.phone?.trim() || null,
       message: body.contact.message?.trim() || null,
       active_workwear_index: body.activeWorkwearIndex,
-      configuration_json: body.workwearStateByIndex,
+      configuration_json: {
+        ...body.workwearStateByIndex,
+        printMaterial: body.printMaterial || "druck",
+      },
       snapshot_urls: snapshotStoragePaths,
       source: "web-konfigurator",
     };
@@ -278,7 +288,7 @@ export async function POST(req: Request) {
       row,
     );
 
-    await sendNotificationMail(requestId, body.contact, signedSnapshotUrls);
+    await sendNotificationMail(requestId, body.contact, signedSnapshotUrls, body.printMaterial);
 
     return NextResponse.json({
       success: true,

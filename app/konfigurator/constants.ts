@@ -76,3 +76,43 @@ export const INITIAL_ZONE_RECT = {
   w: 11.3,
   h: 6.3,
 };
+
+// Antizonen - Bereiche wo keine Zonen platziert werden dürfen (z.B. Reißverschlüsse)
+// Format: { x, y, w, h } als Prozentangaben
+export const FORBIDDEN_ZONES = [
+  // Bild 0 (Jacke vorne)
+  [
+    { x: 45, y: 32, w: 10, h: 45 }, // Reißverschluss Mitte
+  ],
+  // Bild 1 (Jacke hinten)
+  [],
+  // ... weitere Bilder
+] as const;
+
+export function getForbiddenZonesForImage(imageIndex: number): readonly { x: number; y: number; w: number; h: number }[] {
+  return FORBIDDEN_ZONES[imageIndex] ?? [];
+}
+
+export function isZoneOverlappingForbiddenZone(
+  zoneX: number,
+  zoneY: number,
+  zoneW: number,
+  zoneH: number,
+  imageIndex: number,
+): boolean {
+  const forbiddenZones = getForbiddenZonesForImage(imageIndex);
+  
+  for (const forbidden of forbiddenZones) {
+    // Prüfe ob sich die Zonen überschneiden
+    if (
+      zoneX < forbidden.x + forbidden.w &&
+      zoneX + zoneW > forbidden.x &&
+      zoneY < forbidden.y + forbidden.h &&
+      zoneY + zoneH > forbidden.y
+    ) {
+      return true;
+    }
+  }
+  
+  return false;
+}

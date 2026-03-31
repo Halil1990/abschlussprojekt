@@ -11,6 +11,7 @@ type KonfiguratorSubmissionDraft = {
     imageUrl: string;
     dataUrl: string;
   }>;
+  printMaterial: "druck" | "strick";
   createdAt: string;
 };
 
@@ -84,6 +85,7 @@ export default function ContactForm() {
             activeWorkwearIndex: draft.activeWorkwearIndex,
             workwearStateByIndex: draft.workwearStateByIndex,
             snapshots: draft.snapshots,
+            printMaterial: draft.printMaterial,
           }
         : formData;
 
