@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-
 import { useRef, useState } from 'react';
 
 type UploadModalProps = {
@@ -41,7 +39,7 @@ export default function UploadModal({ isOpen, onClose, onFilesSelected }: Upload
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-lg rounded-3xl border border-white/15 bg-gradient-to-br from-black/80 to-black/40 p-8 shadow-2xl">
+      <div className="relative w-full max-w-lg rounded-3xl border border-white/15 bg-linear-to-br from-black/80 to-black/40 p-8 shadow-2xl">
         {/* Close button */}
         <button
           onClick={onClose}

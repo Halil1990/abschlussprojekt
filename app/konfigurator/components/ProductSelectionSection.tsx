@@ -40,7 +40,7 @@ export default function ProductSelectionSection({
                   className="
                     rounded-2xl border border-white/20 bg-white/10 p-4
                     transition-all duration-200
-                    hover:border-white/40 hover:bg-white/[0.12] hover:shadow-xl hover:shadow-black/20
+                    hover:border-white/40 hover:bg-white/12 hover:shadow-xl hover:shadow-black/20
                   "
                 >
                   <div className="rounded-xl border border-white/15 bg-black/30 p-3">

@@ -12,7 +12,7 @@ export default function Hero() {
         priority
         className="object-cover scale-[1.0] object-[center_calc(50%+80px)] sm:object-[center_calc(50%+20px)] saturate-[1.4] contrast-[1.1] brightness-[1.2]"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/50 to-black/30"></div>
+      <div className="absolute inset-0 bg-linear-to-b from-black/75 via-black/50 to-black/30"></div>
 
       <div className="relative z-10 text-center px-4 sm:px-6 max-w-3xl pt-[35vh] sm:pt-[40vh]">
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">

@@ -39,6 +39,7 @@ import {
 import type {
   Asset,
   ZoneDragState,
+  ZoneResizeState,
   ZoneRect,
   PrintMaterial,
 } from "./types";
@@ -90,6 +91,7 @@ export default function Konfigurator() {
   );
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [zoneDrag, setZoneDrag] = useState<ZoneDragState | null>(null);
+  const [zoneResize, setZoneResize] = useState<ZoneResizeState | null>(null);
   const [hasStartedConfigurator, setHasStartedConfigurator] = useState(false);
   const [isPreparingDraft, setIsPreparingDraft] = useState(false);
   const [draftPreparationError, setDraftPreparationError] = useState("");
@@ -624,6 +626,106 @@ export default function Konfigurator() {
     setZoneDrag(null);
   }
 
+  function handleZoneResizeStart(
+    event: ReactPointerEvent<HTMLDivElement>,
+    zoneId: string,
+    corner: 'tl' | 'tr' | 'bl' | 'br',
+  ) {
+    const zone = zones.find((entry) => entry.id === zoneId);
+    if (!zone) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setSelectedZoneId(zoneId);
+
+    setZoneResize({
+      zoneId,
+      pointerId: event.pointerId,
+      corner,
+      startPointerX: event.clientX,
+      startPointerY: event.clientY,
+      startZoneX: zone.x,
+      startZoneY: zone.y,
+      startZoneW: zone.w,
+      startZoneH: zone.h,
+    });
+  }
+
+  function handleZoneResizeMove(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!zoneResize || zoneResize.pointerId !== event.pointerId) return;
+
+    const frame = previewFrameRef.current;
+    if (!frame) return;
+
+    const bounds = frame.getBoundingClientRect();
+    if (bounds.width === 0 || bounds.height === 0) return;
+
+    const deltaXPct =
+      ((event.clientX - zoneResize.startPointerX) / bounds.width) * 100;
+    const deltaYPct =
+      ((event.clientY - zoneResize.startPointerY) / bounds.height) * 100;
+
+    updateZone(zoneResize.zoneId, (zone) => {
+      let newX = zoneResize.startZoneX;
+      let newY = zoneResize.startZoneY;
+      let newW = zoneResize.startZoneW;
+      let newH = zoneResize.startZoneH;
+
+      // Berechne neue Dimensionen basierend auf Corner
+      if (zoneResize.corner === 'tl') {
+        newX = zoneResize.startZoneX + deltaXPct;
+        newY = zoneResize.startZoneY + deltaYPct;
+        newW = zoneResize.startZoneW - deltaXPct;
+        newH = zoneResize.startZoneH - deltaYPct;
+      } else if (zoneResize.corner === 'tr') {
+        newY = zoneResize.startZoneY + deltaYPct;
+        newW = zoneResize.startZoneW + deltaXPct;
+        newH = zoneResize.startZoneH - deltaYPct;
+      } else if (zoneResize.corner === 'bl') {
+        newX = zoneResize.startZoneX + deltaXPct;
+        newW = zoneResize.startZoneW - deltaXPct;
+        newH = zoneResize.startZoneH + deltaYPct;
+      } else if (zoneResize.corner === 'br') {
+        newW = zoneResize.startZoneW + deltaXPct;
+        newH = zoneResize.startZoneH + deltaYPct;
+      }
+
+      // Wende Constraints an: Breite 7.5-15, Höhe proportional dazu halten
+      const aspectRatio = zoneResize.startZoneH / zoneResize.startZoneW;
+      const minW = 7.5;
+      const maxW = 15;
+      
+      newW = clamp(newW, minW, maxW);
+      newH = clamp(newW * aspectRatio, minW * aspectRatio, maxW * aspectRatio);
+      
+      // Stelle sicher, dass die Zone nicht außerhalb der Grenzen geht
+      newX = clamp(newX, 0, 100 - newW);
+      newY = clamp(newY, 0, 100 - newH);
+
+      return {
+        ...zone,
+        x: newX,
+        y: newY,
+        w: Number(newW.toFixed(1)),
+        h: Number(newH.toFixed(1)),
+      };
+    });
+  }
+
+  function handleZoneResizeEnd(event: ReactPointerEvent<HTMLDivElement>) {
+    if (!zoneResize || zoneResize.pointerId !== event.pointerId) return;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+    setZoneResize(null);
+  }
+
+  function rotateZoneById(zoneId: string, degrees: number) {
+    updateZone(zoneId, (zone) => ({
+      ...zone,
+      rotation: (zone.rotation + degrees + 360) % 360,
+    }));
+  }
+
   async function prepareDraftAndOpenMainForm() {
     setIsPreparingDraft(true);
     setDraftPreparationError("");
@@ -961,6 +1063,9 @@ export default function Konfigurator() {
                                   onZoneDragStart={handleZoneDragStart}
                                   onZoneDragMove={handleZoneDragMove}
                                   onZoneDragEnd={handleZoneDragEnd}
+                                  onZoneResizeStart={handleZoneResizeStart}
+                                  onZoneResizeMove={handleZoneResizeMove}
+                                  onZoneResizeEnd={handleZoneResizeEnd}
                                   onClearAsset={clearZone}
                                   onRotate={(degrees) => rotateZoneById(zone.id, degrees)}
                                 />

@@ -31,4 +31,16 @@ export type ZoneDragState = {
   startZoneY: number;
 };
 
+export type ZoneResizeState = {
+  zoneId: string;
+  pointerId: number;
+  corner: 'tl' | 'tr' | 'bl' | 'br';
+  startPointerX: number;
+  startPointerY: number;
+  startZoneX: number;
+  startZoneY: number;
+  startZoneW: number;
+  startZoneH: number;
+};
+
 export type PrintMaterial = "druck" | "strick";
