@@ -96,14 +96,14 @@ Verfolgt laufende Resize-Operation (Corner, Start-Dimensionen, etc.)
 ## Hauptfunktionen
 
 ### Drag & Drop
-- **In [page.tsx](page.tsx#L560):**
+- **In [hooks/useZoneState.ts](hooks/useZoneState.ts#L83):**
   - `handleZoneDragStart()` - Drag initiieren
   - `handleZoneDragMove()` - Position während Drag
   - `handleZoneDragEnd()` - Drag beenden
   - Prüfung auf Forbidden Zones während dem Bewegen
 
 ### Resize (Eckbuttons)
-- **In [page.tsx](page.tsx#L629):**
+- **In [hooks/useZoneState.ts](hooks/useZoneState.ts#L148):**
   - `handleZoneResizeStart()` - Resize mit Corner (tl, tr, bl, br)
   - `handleZoneResizeMove()` - Größe anpassen
   - `handleZoneResizeEnd()` - Resize abschließen
@@ -130,7 +130,7 @@ Verfolgt laufende Resize-Operation (Corner, Start-Dimensionen, etc.)
 ```
 
 ### Rotation
-- **In [page.tsx](page.tsx#L722):**
+- **In [hooks/useZoneState.ts](hooks/useZoneState.ts#L73):**
   - `rotateZoneById()` - Logo um Grad drehen
   - RotateCcw/RotateCw Buttons in WorkwearZone
 
@@ -143,7 +143,7 @@ Verfolgt laufende Resize-Operation (Corner, Start-Dimensionen, etc.)
 
 - **Zonenbreite:** 7.5% - 15% des Containers
 - **Höhe:** Proportional zur Breite (Aspektratio erhalten)
-- **Min/Max in [utils.ts](utils.ts#L8):** `clampZoneWidth()`
+- **Min/Max in [utils/zoneCalculations.ts](utils/zoneCalculations.ts#L14):** `clampZoneWidth()`
 
 ## Workwear-Produkte
 
@@ -166,8 +166,8 @@ WORKWEAR_IMAGES = [
 
 | Route | Beschreibung |
 |-------|-------------|
-| `POST /api/contact` | Kontaktformular abmelden |
-| `POST /api/konfigurator/submit` | Konfiguration abmelden |
+| `POST /api/contact` | Kontaktformular absenden |
+| `POST /api/konfigurator/submit` | Konfiguration absenden |
 
 - **In [app/api/contact/route.ts](../api/contact/route.ts)**
 - **In [app/api/konfigurator/submit/route.ts](../api/konfigurator/submit/route.ts)**
@@ -175,7 +175,7 @@ WORKWEAR_IMAGES = [
 ## LocalStorage Keys
 
 - `konfigurator-workwear-state-v2` - Aktuelle Konfiguration
-- `konfigurator-submission-draft` - Draft für Abmeldung
+- `konfigurator-submission-draft-v1` - Draft für Absendung
 
 ## Häufige Anpassungen
 
@@ -203,7 +203,7 @@ export const FORBIDDEN_ZONES = [
 - **Array-Index:** Entspricht Produkt-Index (0=Jacke vorne, 1=Jacke hinten, etc.)
 
 ### 2. Größenlimits ändern
-📍 [utils.ts](utils.ts#L8) - `clampZoneWidth()`
+📍 [utils/zoneCalculations.ts](utils/zoneCalculations.ts#L14) - `clampZoneWidth()`
 
 ```typescript
 export function clampZoneWidth(width: number) {
@@ -313,7 +313,9 @@ Fertig! 🎉
 - `.ts` - Utility-Funktionen & Types
 - `.tsx` - React Komponenten & Hooks
 - `.css/.module.css` - Styling
-```
+
+### 4. Zone Border-Farbe ändern
+📍 [components/WorkwearZone.tsx](components/WorkwearZone.tsx#L75) - Border-Klassen
 
 **Zone Border-Farbe (Normal):**
 ```typescript
@@ -322,7 +324,7 @@ className="... border-nordwerk-orange ..." // Alternative
 ```
 
 ### 5. Rotation-Winkel anpassen
-📍 [page.tsx](page.tsx#L722) - `rotateZoneById()` Parameter ändern
+📍 [hooks/useZoneState.ts](hooks/useZoneState.ts#L73) - `rotateZoneById()` Parameter ändern
 
 ```typescript
 function rotateZoneById(zoneId: string, degrees: number) {
@@ -361,6 +363,7 @@ export const INITIAL_ZONE_RECT = {
 <div className="absolute -top-10 left-1/2 z-40 -translate-x-1/2 flex items-center gap-2">
   {/* gap-2 = Abstand zwischen Buttons */}
   {/* -top-10 = Position über der Zone */}
+</div>
 ```
 
 ## Performance

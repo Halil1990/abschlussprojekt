@@ -230,7 +230,7 @@ export function KonfiguratorSidebar({
               onChange={(e) => onPrintMaterialChange(e.target.value as PrintMaterial)}
               className="cursor-pointer"
             />
-            <span className="text-sm text-white/85">Strick</span>
+            <span className="text-sm text-white/85">Stick</span>
           </label>
         </div>
       </div>
