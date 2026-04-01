@@ -238,7 +238,7 @@ export function KonfiguratorSidebar({
       {/* Anfrage Form */}
       <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
-          Anfrage ueber Hauptformular
+          Anfrage über Hauptformular
         </p>
         <p className="mt-2 text-xs text-white/80">
           Die Konfiguration wird gespeichert und im Kontaktformular auf der
