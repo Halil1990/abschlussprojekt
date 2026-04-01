@@ -14,14 +14,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://nordwerk-workwear.de"),
   title: "Nordwerk Workwear – Arbeitskleidung mit System",
   description: "Arbeitskleidung für Handwerk & Industrie. Beratung, Ausstattung und Veredelung aus einer Hand. Professionell, normgerecht, langlebig.",
   keywords: ["Arbeitskleidung", "Workwear", "Berufsbekleidung", "Textildruck", "Stick", "Veredelung", "Handwerk", "Industrie", "Nordwerk"],
-  icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/apple-touch-icon.png",
-  },
+  icons: [
+    { url: "/favicon.ico", sizes: "any" },
+    { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+    { url: "/favicon-192x192.png", sizes: "192x192", type: "image/png" },
+    { url: "/favicon-512x512.png", sizes: "512x512", type: "image/png" },
+    { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+  ],
   openGraph: {
     title: "Nordwerk Workwear – Arbeitskleidung mit System",
     description: "Arbeitskleidung für Handwerk & Industrie. Beratung, Ausstattung und Veredelung aus einer Hand.",
