@@ -1,4 +1,7 @@
-import { INITIAL_ZONE_RECT } from "../constants";
+import {
+  getInitialZonePositionsForImage,
+  INITIAL_ZONE_RECT,
+} from "../constants";
 import type { ZoneRectangle } from "../types";
 
 /**
@@ -18,12 +21,29 @@ export function clampZoneWidth(width: number) {
 /**
  * Creates a new zone at a grid position with 2-column layout
  */
-export function createZone(index: number): ZoneRectangle {
+export function createZone(index: number, imageIndex: number): ZoneRectangle {
   const gap = 2;
   const clampedWidth = clampZoneWidth(INITIAL_ZONE_RECT.w);
   const clampedHeight = Number(
     (clampedWidth * (INITIAL_ZONE_RECT.h / INITIAL_ZONE_RECT.w)).toFixed(1)
   );
+
+  const explicitPosition = getInitialZonePositionsForImage(imageIndex)[index - 1];
+  if (explicitPosition) {
+    return {
+      id: "zone-" + index,
+      label: "Zone " + index,
+      x: clamp(explicitPosition.x, 0, 100 - clampedWidth),
+      y: clamp(explicitPosition.y, 0, 100 - clampedHeight),
+      w: clampedWidth,
+      h: clampedHeight,
+      scale: 1,
+      rotation: 0,
+      assetId: null,
+      artworkOffset: { x: 0, y: 0 },
+    };
+  }
+
   const zeroBasedIndex = index - 1;
   const column = zeroBasedIndex % 2;
   const row = Math.floor(zeroBasedIndex / 2);

@@ -72,47 +72,47 @@ export function getMaxZonesForImage(imageIndex: number): number {
 
 export const INITIAL_ZONE_RECT = {
   x: 56,
-  y: 29,
+  y: 35,
   w: 11.3,
   h: 6.3,
 };
 
-// Antizonen - Bereiche wo keine Zonen platziert werden dürfen (z.B. Reißverschlüsse)
-// Format: { x, y, w, h } als Prozentangaben
-export const FORBIDDEN_ZONES = [
-  // Bild 0 (Jacke vorne)
-  [
-    { x: 45, y: 32, w: 10, h: 45 }, // Reißverschluss Mitte
+type ZoneStartPosition = {
+  x: number;
+  y: number;
+};
+
+export const INITIAL_ZONE_POSITIONS_BY_PRODUCT: Record<
+  WorkwearProductId,
+  readonly ZoneStartPosition[]
+> = {
+  jacke: [
+    { x: 29, y: 38 },
+    { x: 62, y: 38 },
   ],
-  // Bild 1 (Jacke hinten)
-  [],
-  // ... weitere Bilder
-] as const;
+  hose: [
+    { x: 30, y: 24 },
+    { x: 56, y: 24 },
+  ],
+  latzhose: [
+    { x: 36, y: 40 },
+    { x: 56, y: 40 },
+  ],
+  weste: [
+    { x: 27, y: 38 },
+    { x: 62, y: 38 },
+  ],
+};
 
-export function getForbiddenZonesForImage(imageIndex: number): readonly { x: number; y: number; w: number; h: number }[] {
-  return FORBIDDEN_ZONES[imageIndex] ?? [];
-}
-
-export function isZoneOverlappingForbiddenZone(
-  zoneX: number,
-  zoneY: number,
-  zoneW: number,
-  zoneH: number,
+export function getInitialZonePositionsForImage(
   imageIndex: number,
-): boolean {
-  const forbiddenZones = getForbiddenZonesForImage(imageIndex);
-  
-  for (const forbidden of forbiddenZones) {
-    // Prüfe ob sich die Zonen überschneiden
-    if (
-      zoneX < forbidden.x + forbidden.w &&
-      zoneX + zoneW > forbidden.x &&
-      zoneY < forbidden.y + forbidden.h &&
-      zoneY + zoneH > forbidden.y
-    ) {
-      return true;
-    }
-  }
-  
-  return false;
+): readonly ZoneStartPosition[] {
+  const productIndex = Math.floor(imageIndex / WORKWEAR_VIEWS_PER_PRODUCT);
+  const productId =
+    WORKWEAR_PRODUCTS[productIndex]?.id ?? WORKWEAR_PRODUCTS[0].id;
+
+  return (
+    INITIAL_ZONE_POSITIONS_BY_PRODUCT[productId] ??
+    INITIAL_ZONE_POSITIONS_BY_PRODUCT.jacke
+  );
 }

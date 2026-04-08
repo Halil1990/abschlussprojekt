@@ -1,9 +1,10 @@
 import { useState, useRef, useCallback, type PointerEvent as ReactPointerEvent } from "react";
 import { clamp, clampZoneWidth } from "../utils";
-import { isZoneOverlappingForbiddenZone } from "../constants";
+import { useAntiZone } from "./useAntiZone";
 import type { ZoneRectangle, ZoneDragState, ZoneResizeState } from "../types";
 
 export function useZoneState(initialZones: ZoneRectangle[], initialSelectedZoneId: string) {
+  const { isZoneOverlappingForbiddenZone } = useAntiZone();
   const [zones, setZones] = useState<ZoneRectangle[]>(initialZones);
   const [selectedZoneId, setSelectedZoneId] = useState(initialSelectedZoneId);
   const [zoneDrag, setZoneDrag] = useState<ZoneDragState | null>(null);
@@ -133,7 +134,7 @@ export function useZoneState(initialZones: ZoneRectangle[], initialSelectedZoneI
         };
       });
     },
-    [zoneDrag, updateZone]
+    [zoneDrag, updateZone, isZoneOverlappingForbiddenZone]
   );
 
   const handleZoneDragEnd = useCallback(

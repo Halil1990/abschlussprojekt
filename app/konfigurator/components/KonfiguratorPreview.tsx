@@ -3,11 +3,8 @@
 import { type PointerEvent as ReactPointerEvent } from "react";
 import WorkwearZone from "./WorkwearZone";
 import type { Asset, ZoneRectangle, ZoneDragState } from "../types";
-import {
-  WORKWEAR_IMAGES,
-  ZONE_DROP_PREFIX,
-  getForbiddenZonesForImage,
-} from "../constants";
+import { WORKWEAR_IMAGES, ZONE_DROP_PREFIX } from "../constants";
+import { useAntiZone } from "../hooks/useAntiZone";
 import { getArtworkTransform } from "../utils";
 import {
   getWorkwearProductByIndex,
@@ -65,17 +62,33 @@ export function KonfiguratorPreview({
   onClearZone,
   onRotateZone,
 }: KonfiguratorPreviewProps) {
+  const { getForbiddenZonesForImage } = useAntiZone();
   const activeProduct = getWorkwearProductByIndex(activeWorkwearIndex);
   const activeWorkwearImage = WORKWEAR_IMAGES[activeWorkwearIndex];
+  const activeSideLabel = getWorkwearSideLabel(activeWorkwearImage);
 
   return (
-    <section className="rounded-3xl border border-white/15 bg-black/45 p-4 sm:p-6">
-      <div className="mt-5 rounded-4xl border border-white/10 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),rgba(0,0,0,0.18)_48%,rgba(0,0,0,0.4)_100%)] p-4 sm:p-8">
+    <section className="rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-6">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 px-1">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
+            Vorschau
+          </p>
+          <p className="text-sm font-semibold text-white sm:text-base">
+            {getWorkwearProductShortLabel(activeProduct)} - {activeSideLabel}
+          </p>
+        </div>
+        <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-white/80">
+          {previewOnly ? "Preview" : "Editor"}
+        </span>
+      </div>
+
+      <div className="rounded-4xl border border-white/10 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.14),rgba(0,0,0,0.18)_48%,rgba(0,0,0,0.45)_100%)] p-4 sm:p-8">
         <div className="mx-auto max-w-155">
           <div className="relative">
             <div
               ref={previewFrameRef}
-              className="relative mx-auto w-full overflow-hidden"
+              className="relative mx-auto w-full overflow-hidden rounded-[1.4rem] border border-white/10 bg-black/25 shadow-[0_14px_34px_rgba(0,0,0,0.35)]"
               style={{ aspectRatio: "768 / 1320" }}
             >
               <div
@@ -165,10 +178,10 @@ export function KonfiguratorPreview({
             </div>
 
             {/* Thumbnail Gallery */}
-            <div className="flex justify-center">
+            <div className="mt-5 flex justify-center">
               <div
                 ref={thumbnailStripRef}
-                className="flex w-fit gap-2 overflow-x-auto pb-2"
+                className="mx-auto flex w-fit max-w-full gap-2 overflow-x-auto rounded-xl border border-white/10 bg-black/25 p-2 pb-2"
               >
                 {visibleProductImageIndexes.map((index) => {
                   const imageUrl = WORKWEAR_IMAGES[index];
@@ -178,7 +191,7 @@ export function KonfiguratorPreview({
                       <button
                         type="button"
                         onClick={() => onSelectWorkwearImage(index)}
-                        className={`relative overflow-hidden border-2 transition ${
+                        className={`relative overflow-hidden rounded-lg border-2 transition ${
                           activeWorkwearIndex === index
                             ? "border-nordwerk-orange shadow-lg shadow-nordwerk-orange/40"
                             : "border-white/20 hover:border-white/40"

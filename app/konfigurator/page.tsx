@@ -309,43 +309,45 @@ export default function Konfigurator() {
             />
           ) : (
             <DndContext sensors={sensors} onDragEnd={handleDragEndWithAssignment}>
-              <div className="mt-8 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
-                <KonfiguratorSidebar
-                  assets={assets}
-                  zones={zones}
-                  selectedZone={selectedZone}
-                  selectedAsset={
-                    selectedZone?.assetId ? assetMap.get(selectedZone.assetId) : undefined
-                  }
-                  maxZonesForCurrentImage={maxZonesForCurrentImage}
-                  previewOnly={previewOnly}
-                  isPreparingDraft={isPreparingDraft}
-                  draftPreparationError={draftPreparationError}
-                  draftPreparationSuccess={draftPreparationSuccess}
-                  printMaterial={printMaterial}
-                  onSelectedZoneChange={setSelectedZoneId}
-                  onAssetAssign={assignAssetToSelectedZone}
-                  onAssetRemove={removeAssetWithChainCleanup}
-                  onUploadModalOpen={() => setIsUploadModalOpen(true)}
-                  onTutorialOpen={() => setIsTutorialOpen(true)}
-                  onPreviewOnlyToggle={() => setPreviewOnly((prev) => !prev)}
-                  onRotateLeft={() => rotateArtwork(-5)}
-                  onRotateRight={() => rotateArtwork(5)}
-                  onZoneSizeDecrease={() =>
-                    updateZoneSize((selectedZone?.w ?? 11.3) - 1)
-                  }
-                  onZoneSizeincrease={() =>
-                    updateZoneSize((selectedZone?.w ?? 11.3) + 1)
-                  }
-                  onZoneSizeChange={updateZoneSize}
-                  onClearZone={clearZone}
-                  onPrintMaterialChange={setPrintMaterial}
-                  onPrepareDraft={prepareDraftAndOpenMainForm}
-                  onBackToSelection={() => {
-                    saveCurrentWorkwearState(activeWorkwearIndex);
-                    setHasStartedConfigurator(false);
-                  }}
-                />
+              <div className="mt-8 grid items-start gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+                <div className="lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
+                  <KonfiguratorSidebar
+                    assets={assets}
+                    zones={zones}
+                    selectedZone={selectedZone}
+                    selectedAsset={
+                      selectedZone?.assetId ? assetMap.get(selectedZone.assetId) : undefined
+                    }
+                    maxZonesForCurrentImage={maxZonesForCurrentImage}
+                    previewOnly={previewOnly}
+                    isPreparingDraft={isPreparingDraft}
+                    draftPreparationError={draftPreparationError}
+                    draftPreparationSuccess={draftPreparationSuccess}
+                    printMaterial={printMaterial}
+                    onSelectedZoneChange={setSelectedZoneId}
+                    onAssetAssign={assignAssetToSelectedZone}
+                    onAssetRemove={removeAssetWithChainCleanup}
+                    onUploadModalOpen={() => setIsUploadModalOpen(true)}
+                    onTutorialOpen={() => setIsTutorialOpen(true)}
+                    onPreviewOnlyToggle={() => setPreviewOnly((prev) => !prev)}
+                    onRotateLeft={() => rotateArtwork(-5)}
+                    onRotateRight={() => rotateArtwork(5)}
+                    onZoneSizeDecrease={() =>
+                      updateZoneSize((selectedZone?.w ?? 11.3) - 1)
+                    }
+                    onZoneSizeincrease={() =>
+                      updateZoneSize((selectedZone?.w ?? 11.3) + 1)
+                    }
+                    onZoneSizeChange={updateZoneSize}
+                    onClearZone={clearZone}
+                    onPrintMaterialChange={setPrintMaterial}
+                    onPrepareDraft={prepareDraftAndOpenMainForm}
+                    onBackToSelection={() => {
+                      saveCurrentWorkwearState(activeWorkwearIndex);
+                      setHasStartedConfigurator(false);
+                    }}
+                  />
+                </div>
 
                 <div
                   ref={(node) => {

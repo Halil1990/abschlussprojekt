@@ -26,7 +26,9 @@ function normalizeZonesForImage(zones: ZoneRectangle[], imageIndex: number): Zon
 
   const normalizedZones: ZoneRectangle[] = [];
   for (let zoneIndex = 1; zoneIndex <= maxZones; zoneIndex += 1) {
-    normalizedZones.push(zonesByIndex.get(zoneIndex) ?? createZone(zoneIndex));
+    normalizedZones.push(
+      zonesByIndex.get(zoneIndex) ?? createZone(zoneIndex, imageIndex),
+    );
   }
 
   return normalizedZones;
