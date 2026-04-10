@@ -3,6 +3,21 @@ import { PREVIEW_DROP_ID, ZONE_DROP_PREFIX } from "../constants";
 import type { DragEndEvent } from "@dnd-kit/core";
 import type { Asset, ZoneRectangle } from "../types";
 
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+      reject(new Error("Datei konnte nicht gelesen werden."));
+    };
+    reader.onerror = () => reject(new Error("Datei konnte nicht gelesen werden."));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function useAssetManagement() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const urlsRef = useRef<string[]>([]);
@@ -12,16 +27,17 @@ export function useAssetManagement() {
     [assets]
   );
 
-  const handleFiles = useCallback((files: FileList | null) => {
+  const handleFiles = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
-    const added = Array.from(files)
-      .filter((file) => file.type.startsWith("image/"))
-      .map((file) => {
-        const src = URL.createObjectURL(file);
-        urlsRef.current.push(src);
-        return { id: crypto.randomUUID(), name: file.name, src };
-      });
+    const imageFiles = Array.from(files).filter((file) => file.type.startsWith("image/"));
+    const added = await Promise.all(
+      imageFiles.map(async (file) => ({
+        id: crypto.randomUUID(),
+        name: file.name,
+        src: await readFileAsDataUrl(file),
+      })),
+    );
 
     if (added.length > 0) setAssets((prev) => [...added, ...prev]);
   }, []);

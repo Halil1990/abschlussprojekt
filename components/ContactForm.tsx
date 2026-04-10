@@ -11,7 +11,7 @@ type KonfiguratorSubmissionDraft = {
     imageUrl: string;
     dataUrl: string;
   }>;
-  printMaterial: "druck" | "strick";
+  printMaterial: "druck" | "stick";
   createdAt: string;
 };
 

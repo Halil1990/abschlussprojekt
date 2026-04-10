@@ -9,12 +9,12 @@ interface KonfiguratorSidebarProps {
   selectedZone: ZoneRectangle | null;
   selectedAsset: Asset | undefined;
   maxZonesForCurrentImage: number;
+  printMaterialInputName?: string;
   previewOnly: boolean;
   isPreparingDraft: boolean;
   draftPreparationError: string;
   draftPreparationSuccess: string;
   printMaterial: PrintMaterial;
-  onSelectedZoneChange: (zoneId: string) => void;
   onAssetAssign: (assetId: string) => void;
   onAssetRemove: (assetId: string) => void;
   onUploadModalOpen: () => void;
@@ -30,16 +30,13 @@ interface KonfiguratorSidebarProps {
 
 export function KonfiguratorSidebar({
   assets,
-  zones,
-  selectedZone,
   selectedAsset,
-  maxZonesForCurrentImage,
+  printMaterialInputName = "printMaterial",
   previewOnly,
   isPreparingDraft,
   draftPreparationError,
   draftPreparationSuccess,
   printMaterial,
-  onSelectedZoneChange,
   onAssetAssign,
   onAssetRemove,
   onUploadModalOpen,
@@ -47,7 +44,6 @@ export function KonfiguratorSidebar({
   onPreviewOnlyToggle,
   onRotateLeft,
   onRotateRight,
-  onClearZone,
   onPrintMaterialChange,
   onPrepareDraft,
   onBackToSelection,
@@ -68,9 +64,7 @@ export function KonfiguratorSidebar({
       <p className="mt-1 pt-5 text-sm text-white/80">
         Logo per Drag and Drop oder Klick einer festen Zone zuweisen.
       </p>
-      <p className="mt-1 text-xs text-white/70">
-        Zonen pro Bild: {zones.length} / {maxZonesForCurrentImage}
-      </p>
+
 
       <button
         type="button"
@@ -80,7 +74,7 @@ export function KonfiguratorSidebar({
         + Bilder hochladen
       </button>
 
-      <div className="mt-4 max-h-96 space-y-3 overflow-auto pr-1">
+      <div className="mt-4 max-h-96 space-y-3 overflow-y-auto overflow-x-hidden pr-1">
         {assets.length === 0 ? (
           <div className="rounded-xl border border-white/15 bg-black/30 p-4 text-sm text-white/80">
             Noch keine Bilder hochgeladen.
@@ -97,48 +91,12 @@ export function KonfiguratorSidebar({
         )}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {zones.map((zone) => (
-          <button
-            key={zone.id}
-            type="button"
-            onClick={() => onSelectedZoneChange(zone.id)}
-            className={`rounded-full px-3 py-2 text-xs font-semibold transition ${
-              selectedZone?.id === zone.id
-                ? "bg-nordwerk-orange text-black"
-                : "bg-white/10 text-white hover:bg-white/20"
-            }`}
-          >
-            {zone.label}
-          </button>
-        ))}
-      </div>
-
       {/* Aktive Zone Controls */}
       <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
           Aktive Zone
         </p>
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <div>
-            <p className="text-base font-semibold text-white">
-              {selectedZone ? selectedZone.label : "-"}
-            </p>
-          </div>
-          {selectedAsset ? (
-            <button
-              type="button"
-              onClick={() => {
-                if (selectedZone) {
-                  onClearZone(selectedZone.id);
-                }
-              }}
-              className="rounded-lg border border-red-300/35 px-3 py-2 text-xs font-medium text-red-200 transition hover:border-red-200/60 hover:text-white"
-            >
-              Bild Entfernen
-            </button>
-          ) : null}
-        </div>
+
 
         <div className="mt-4 flex items-center gap-2">
           <button
@@ -166,6 +124,25 @@ export function KonfiguratorSidebar({
         >
           {previewOnly ? "Bearbeitung anzeigen" : "Nur Bild anzeigen"}
         </button>
+
+
+        {/* bild entfernen button zeile 138-152 */}
+        {/* <div className="mt-3 flex items-center justify-center gap-3">
+          {selectedAsset ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (selectedZone) {
+                  onClearZone(selectedZone.id);
+                }
+              }}
+              className="rounded-lg border border-red-300/35 px-3 py-2 text-xs font-medium text-red-200 transition hover:border-red-200/60 hover:text-white"
+            >
+              Bild Entfernen
+            </button>
+          ) : null}
+        </div> */}
+
       </div>
 
       {/* Druckmaterial */}
@@ -177,7 +154,7 @@ export function KonfiguratorSidebar({
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
-              name="printMaterial"
+              name={printMaterialInputName}
               value="druck"
               checked={printMaterial === "druck"}
               onChange={(e) => onPrintMaterialChange(e.target.value as PrintMaterial)}
@@ -188,7 +165,7 @@ export function KonfiguratorSidebar({
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
-              name="printMaterial"
+              name={printMaterialInputName}
               value="stick"
               checked={printMaterial === "stick"}
               onChange={(e) => onPrintMaterialChange(e.target.value as PrintMaterial)}

@@ -21,7 +21,7 @@ export function createZone(index: number, imageIndex: number): ZoneRectangle {
 
     return {
       id: "zone-" + index,
-      label: "Zone " + index,
+      label: String(index),
       x: clamp(zoneTemplate.x, 0, 100 - clampedWidth),
       y: clamp(zoneTemplate.y, 0, 100 - clampedHeight),
       w: clampedWidth,
@@ -35,7 +35,7 @@ export function createZone(index: number, imageIndex: number): ZoneRectangle {
 
   return {
     id: "zone-" + index,
-    label: "Zone " + index,
+    label: String(index),
     x: 0,
     y: 0,
     w: 10,

@@ -51,6 +51,32 @@ export const WORKWEAR_PRODUCTS = [
 export type WorkwearProductId = (typeof WORKWEAR_PRODUCTS)[number]['id'];
 export const WORKWEAR_VIEWS_PER_PRODUCT = WORKWEAR_VIEW_FILENAMES.length;
 
+export const WORKWEAR_PREVIEW_COLORS = [
+  {
+    id: 'black',
+    label: 'Schwarz',
+    hex: '#1f1f1f',
+  },
+  {
+    id: 'blue',
+    label: 'Blau',
+    hex: '#1d4ed8',
+  },
+  {
+    id: 'red',
+    label: 'Rot',
+    hex: '#dc2626',
+  },
+  {
+    id: 'white',
+    label: 'Weiss',
+    hex: '#f3f4f6',
+  },
+] as const;
+
+export type WorkwearPreviewColorId =
+  (typeof WORKWEAR_PREVIEW_COLORS)[number]['id'];
+
 const buildImageSequence = (folder: string, imageExtension: string) =>
   WORKWEAR_VIEW_FILENAMES.map((fileName) => {
     const viewName = fileName.replace(/\.[^.]+$/, '');
@@ -66,6 +92,26 @@ export const WORKWEAR_IMAGES: readonly string[] = [
     buildImageSequence(product.folder, product.imageExtension),
   ),
 ];
+
+export const WORKWEAR_COLOR_PREVIEW_IMAGES: Record<
+  WorkwearProductId,
+  Record<WorkwearPreviewColorId, string>
+> = Object.fromEntries(
+  WORKWEAR_PRODUCTS.map((product) => {
+    const colorEntries = WORKWEAR_PREVIEW_COLORS.map((color) => {
+      const baseUrl =
+        STORAGE_BASE_URL + '/preview/' + product.folder + '/' + color.id + '.png';
+      const url = IMAGE_VERSION ? baseUrl + '?v=' + IMAGE_VERSION : baseUrl;
+      return [color.id, url] as const;
+    });
+
+    return [
+      product.id,
+      Object.fromEntries(colorEntries),
+    ] as const;
+  }),
+) as Record<WorkwearProductId, Record<WorkwearPreviewColorId, string>>;
+
 export const DEFAULT_WORKWEAR_INDEX = 0;
 
 export const PREVIEW_DROP_ID = 'preview-drop';

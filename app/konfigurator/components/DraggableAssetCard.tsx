@@ -1,8 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useDraggable } from '@dnd-kit/core';
-import { type CSSProperties } from 'react';
-
 import type { Asset } from '../types';
 
 type DraggableAssetCardProps = {
@@ -16,15 +14,12 @@ export default function DraggableAssetCard({
   onAssign,
   onRemove,
 }: DraggableAssetCardProps) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: 'asset:' + asset.id,
   });
 
-  const style: CSSProperties = {
-    transform: transform
-      ? 'translate3d(' + transform.x + 'px, ' + transform.y + 'px, 0)'
-      : undefined,
-    opacity: isDragging ? 0.6 : 1,
+  const style = {
+    opacity: isDragging ? 0.35 : 1,
   };
 
   return (

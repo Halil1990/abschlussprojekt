@@ -5,6 +5,10 @@ import { Trash2, RotateCcw, RotateCw } from 'lucide-react';
 
 import type { Asset, ZoneRectangle } from '../types';
 
+function getCompactZoneLabel(label: string) {
+  return label.replace(/^zone\s*/i, '').trim();
+}
+
 type WorkwearZoneProps = {
   zone: ZoneRectangle;
   asset: Asset | undefined;
@@ -94,7 +98,7 @@ export default function WorkwearZone({
       {!asset ? (
         <div className="absolute inset-0 flex items-center justify-center px-1 text-center">
           <span className="rounded bg-black/75 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white sm:text-[11px]">
-            {zone.label}
+            {getCompactZoneLabel(zone.label)}
           </span>
         </div>
       ) : (

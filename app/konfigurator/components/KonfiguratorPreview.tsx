@@ -24,6 +24,7 @@ interface KonfiguratorPreviewProps {
   onSelectWorkwearImage: (index: number) => void;
   onClearZone: (zoneId: string) => void;
   onRotateZone: (zoneId: string, degrees: number) => void;
+  onOpenTools: () => void;
 }
 
 export function KonfiguratorPreview({
@@ -40,29 +41,31 @@ export function KonfiguratorPreview({
   onSelectWorkwearImage,
   onClearZone,
   onRotateZone,
+  onOpenTools,
 }: KonfiguratorPreviewProps) {
   const activeProduct = getWorkwearProductByIndex(activeWorkwearIndex);
   const activeWorkwearImage = WORKWEAR_IMAGES[activeWorkwearIndex];
-  const activeSideLabel = getWorkwearSideLabel(activeWorkwearImage);
+  // const activeSideLabel = getWorkwearSideLabel(activeWorkwearImage);
 
   return (
-    <section className="rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-white">Vorschau</h2>
+    <section className="mx-auto w-full max-w-240 rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
+      <div className="relative flex items-center justify-center">
         <button
           type="button"
-          className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
+          onClick={onOpenTools}
+          className="absolute left-0 rounded-xl border border-white/25 bg-black/45 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-black/60 2xl:hidden"
         >
-          {previewOnly ? "👁️" : "✏️"}
+          Werkzeuge
         </button>
+        <h2 className="text-lg font-semibold text-white">Vorschau</h2>
       </div>
-      <p className="mt-1 pt-5 text-sm text-white/80">
+      {/* <p className="mt-1 pt-5 text-sm text-white/80">
         {getWorkwearProductShortLabel(activeProduct)} - {activeSideLabel}
-      </p>
+      </p> */}
 
-      <div className="mt-4 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+      <div className="mt-4 mx-auto w-full max-w-180 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <div className="mx-auto max-w-155">
-          <div className="relative">
+          <div className="relative py-3 sm:py-4">
             <div
               ref={previewFrameRef}
               className="relative mx-auto w-full overflow-hidden rounded-[1.4rem] border border-white/10 bg-black/25 shadow-[0_14px_34px_rgba(0,0,0,0.35)]"
@@ -130,47 +133,47 @@ export function KonfiguratorPreview({
 
               </div>
             </div>
-
-            <div className="mt-5 flex justify-center">
-              <div
-                ref={thumbnailStripRef}
-                className="mx-auto flex w-fit max-w-full gap-2 overflow-x-auto rounded-xl border border-white/10 bg-black/25 p-2 pb-2"
-              >
-                {visibleProductImageIndexes.map((index) => {
-                  const imageUrl = WORKWEAR_IMAGES[index];
-
-                  return (
-                    <div key={index} className="shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => onSelectWorkwearImage(index)}
-                        className={`relative overflow-hidden rounded-lg border-2 transition ${
-                          activeWorkwearIndex === index
-                            ? "border-nordwerk-orange shadow-lg shadow-nordwerk-orange/40"
-                            : "border-white/20 hover:border-white/40"
-                        }`}
-                        style={{
-                          width: "62px",
-                          height: "92px",
-                          aspectRatio: "768 / 1366",
-                        }}
-                        aria-label={`${getWorkwearProductShortLabel(activeProduct)} ${getWorkwearSideLabel(imageUrl)}`}
-                      >
-                        <img
-                          src={imageUrl}
-                          alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
-                          className="h-full w-full object-cover"
-                        />
-                      </button>
-                      <p className="mt-1 text-center text-[11px] font-medium text-white/80">
-                        {getWorkwearSideLabel(imageUrl)}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
           </div>
+        </div>
+      </div>
+
+      <div className="mt-5 flex justify-center">
+        <div
+          ref={thumbnailStripRef}
+          className="mx-auto flex w-fit max-w-full gap-2 overflow-x-auto rounded-xl border border-white/10 bg-black/25 p-2 pb-2"
+        >
+          {visibleProductImageIndexes.map((index) => {
+            const imageUrl = WORKWEAR_IMAGES[index];
+
+            return (
+              <div key={index} className="shrink-0">
+                <button
+                  type="button"
+                  onClick={() => onSelectWorkwearImage(index)}
+                  className={`relative overflow-hidden rounded-lg border-2 transition ${
+                    activeWorkwearIndex === index
+                      ? "border-nordwerk-orange shadow-lg shadow-nordwerk-orange/40"
+                      : "border-white/20 hover:border-white/40"
+                  }`}
+                  style={{
+                    width: "62px",
+                    height: "92px",
+                    aspectRatio: "768 / 1366",
+                  }}
+                  aria-label={`${getWorkwearProductShortLabel(activeProduct)} ${getWorkwearSideLabel(imageUrl)}`}
+                >
+                  <img
+                    src={imageUrl}
+                    alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+                <p className="mt-1 text-center text-[11px] font-medium text-white/80">
+                  {getWorkwearSideLabel(imageUrl)}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

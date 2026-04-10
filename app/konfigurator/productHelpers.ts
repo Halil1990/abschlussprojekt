@@ -2,7 +2,9 @@ import {
   WORKWEAR_PRODUCTS,
   WORKWEAR_VIEWS_PER_PRODUCT,
   WORKWEAR_IMAGES,
+  WORKWEAR_COLOR_PREVIEW_IMAGES,
   type WorkwearProductId,
+  type WorkwearPreviewColorId,
 } from "./constants";
 
 export const WORKWEAR_FRONTPAGE_ORDER: readonly WorkwearProductId[] = [
@@ -32,6 +34,16 @@ export function getWorkwearProductShortLabel(product: WorkwearProductId): string
 
 export function getWorkwearProductPreviewImage(product: WorkwearProductId): string {
   return WORKWEAR_IMAGES[getWorkwearProductStartIndex(product)];
+}
+
+export function getWorkwearProductColorPreviewImage(
+  product: WorkwearProductId,
+  colorId: WorkwearPreviewColorId,
+): string {
+  return (
+    WORKWEAR_COLOR_PREVIEW_IMAGES[product]?.[colorId] ??
+    getWorkwearProductPreviewImage(product)
+  );
 }
 
 export function getWorkwearSideLabel(imageUrl: string): string {
