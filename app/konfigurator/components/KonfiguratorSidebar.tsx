@@ -51,7 +51,9 @@ export function KonfiguratorSidebar({
   return (
     <aside className="rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-white">So funktioniert’s: </h2>
+        <h2 className="text-lg font-semibold text-white">
+          So funktioniert’s:{" "}
+        </h2>
         <button
           type="button"
           onClick={onTutorialOpen}
@@ -64,7 +66,6 @@ export function KonfiguratorSidebar({
       <p className="mt-1 pt-5 text-sm text-white/80">
         Logo per Drag and Drop oder Klick einer festen Zone zuweisen.
       </p>
-
 
       <button
         type="button"
@@ -97,7 +98,6 @@ export function KonfiguratorSidebar({
           Aktive Zone
         </p>
 
-
         <div className="mt-4 flex items-center gap-2">
           <button
             type="button"
@@ -125,7 +125,6 @@ export function KonfiguratorSidebar({
           {previewOnly ? "Bearbeitung anzeigen" : "Nur Bild anzeigen"}
         </button>
 
-
         {/* bild entfernen button zeile 138-152 */}
         {/* <div className="mt-3 flex items-center justify-center gap-3">
           {selectedAsset ? (
@@ -142,7 +141,6 @@ export function KonfiguratorSidebar({
             </button>
           ) : null}
         </div> */}
-
       </div>
 
       {/* Druckmaterial */}
@@ -157,7 +155,9 @@ export function KonfiguratorSidebar({
               name={printMaterialInputName}
               value="druck"
               checked={printMaterial === "druck"}
-              onChange={(e) => onPrintMaterialChange(e.target.value as PrintMaterial)}
+              onChange={(e) =>
+                onPrintMaterialChange(e.target.value as PrintMaterial)
+              }
               className="cursor-pointer"
             />
             <span className="text-sm text-white/85">Druck</span>
@@ -168,12 +168,18 @@ export function KonfiguratorSidebar({
               name={printMaterialInputName}
               value="stick"
               checked={printMaterial === "stick"}
-              onChange={(e) => onPrintMaterialChange(e.target.value as PrintMaterial)}
+              onChange={(e) =>
+                onPrintMaterialChange(e.target.value as PrintMaterial)
+              }
               className="cursor-pointer"
             />
             <span className="text-sm text-white/85">Stick</span>
           </label>
         </div>
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+              <p className="font-bold uppercase underline tracking-[0.18em] text-white/70">Bitte geben Sie bei Ihrer Anfrage unbedingt die gewünschte Anzahl sowie die Größen der Kleidungsstücke an, damit wir Ihre Anfrage schnell und korrekt bearbeiten können</p>
       </div>
 
       {/* Anfrage Form */}
@@ -196,7 +202,9 @@ export function KonfiguratorSidebar({
             : "Zum Kontaktformular"}
         </button>
         {draftPreparationSuccess ? (
-          <p className="mt-2 text-xs text-emerald-300">{draftPreparationSuccess}</p>
+          <p className="mt-2 text-xs text-emerald-300">
+            {draftPreparationSuccess}
+          </p>
         ) : null}
         {draftPreparationError ? (
           <p className="mt-2 text-xs text-red-300">{draftPreparationError}</p>

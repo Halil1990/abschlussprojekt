@@ -128,7 +128,7 @@ export const ZONE_TEMPLATES_BY_PRODUCT_AND_VIEW: Record<
 > = {
   jacke: {
     vorne: [
-      { x: 27, y: 37, w: 12, h: 7.2 },
+      { x: 30, y: 37, w: 12, h: 7.2 },
     ],
     hinten: [
       { x: 47, y: 18, w: 8, h: 2.7 },
