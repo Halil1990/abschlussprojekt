@@ -1,10 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { type PointerEvent as ReactPointerEvent } from "react";
 import WorkwearZone from "./WorkwearZone";
-import type { Asset, ZoneRectangle, ZoneDragState } from "../types";
+import type { Asset, ZoneRectangle } from "../types";
 import { WORKWEAR_IMAGES, ZONE_DROP_PREFIX } from "../constants";
-import { useAntiZone } from "../hooks/useAntiZone";
 import { getArtworkTransform } from "../utils";
 import {
   getWorkwearProductByIndex,
@@ -20,22 +18,10 @@ interface KonfiguratorPreviewProps {
   previewOnly: boolean;
   isOverPreview: boolean;
   visibleProductImageIndexes: number[];
-  zoneDrag: ZoneDragState | null;
   previewFrameRef: React.RefObject<HTMLDivElement | null>;
   thumbnailStripRef: React.RefObject<HTMLDivElement | null>;
-  onThumbnailStripScroll?: () => void;
   onSelectZone: (zoneId: string) => void;
   onSelectWorkwearImage: (index: number) => void;
-  onZoneDragStart: (event: ReactPointerEvent<HTMLDivElement>, zoneId: string) => void;
-  onZoneDragMove: (event: ReactPointerEvent<HTMLDivElement>) => void;
-  onZoneDragEnd: (event: ReactPointerEvent<HTMLDivElement>) => void;
-  onZoneResizeStart: (
-    event: ReactPointerEvent<HTMLDivElement>,
-    zoneId: string,
-    corner: "tl" | "tr" | "bl" | "br"
-  ) => void;
-  onZoneResizeMove: (event: ReactPointerEvent<HTMLDivElement>) => void;
-  onZoneResizeEnd: (event: ReactPointerEvent<HTMLDivElement>) => void;
   onClearZone: (zoneId: string) => void;
   onRotateZone: (zoneId: string, degrees: number) => void;
 }
@@ -48,42 +34,33 @@ export function KonfiguratorPreview({
   previewOnly,
   isOverPreview,
   visibleProductImageIndexes,
-  zoneDrag,
   previewFrameRef,
   thumbnailStripRef,
   onSelectZone,
   onSelectWorkwearImage,
-  onZoneDragStart,
-  onZoneDragMove,
-  onZoneDragEnd,
-  onZoneResizeStart,
-  onZoneResizeMove,
-  onZoneResizeEnd,
   onClearZone,
   onRotateZone,
 }: KonfiguratorPreviewProps) {
-  const { getForbiddenZonesForImage } = useAntiZone();
   const activeProduct = getWorkwearProductByIndex(activeWorkwearIndex);
   const activeWorkwearImage = WORKWEAR_IMAGES[activeWorkwearIndex];
   const activeSideLabel = getWorkwearSideLabel(activeWorkwearImage);
 
   return (
-    <section className="rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 px-1">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
-            Vorschau
-          </p>
-          <p className="text-sm font-semibold text-white sm:text-base">
-            {getWorkwearProductShortLabel(activeProduct)} - {activeSideLabel}
-          </p>
-        </div>
-        <span className="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-white/80">
-          {previewOnly ? "Preview" : "Editor"}
-        </span>
+    <section className="rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold text-white">Vorschau</h2>
+        <button
+          type="button"
+          className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
+        >
+          {previewOnly ? "👁️" : "✏️"}
+        </button>
       </div>
+      <p className="mt-1 pt-5 text-sm text-white/80">
+        {getWorkwearProductShortLabel(activeProduct)} - {activeSideLabel}
+      </p>
 
-      <div className="rounded-4xl border border-white/10 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.14),rgba(0,0,0,0.18)_48%,rgba(0,0,0,0.45)_100%)] p-4 sm:p-8">
+      <div className="mt-4 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <div className="mx-auto max-w-155">
           <div className="relative">
             <div
@@ -98,7 +75,7 @@ export function KonfiguratorPreview({
                 <img
                   src={activeWorkwearImage}
                   alt={`Workwear ${getWorkwearProductShortLabel(activeProduct)}`}
-                  className="pointer-events-none select-none object-contain absolute inset-0 h-full w-full"
+                  className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
                 />
 
                 {previewOnly
@@ -146,38 +123,14 @@ export function KonfiguratorPreview({
                         }
                         zoneDropPrefix={ZONE_DROP_PREFIX}
                         onSelect={onSelectZone}
-                        onZoneDragStart={onZoneDragStart}
-                        onZoneDragMove={onZoneDragMove}
-                        onZoneDragEnd={onZoneDragEnd}
-                        onZoneResizeStart={onZoneResizeStart}
-                        onZoneResizeMove={onZoneResizeMove}
-                        onZoneResizeEnd={onZoneResizeEnd}
                         onClearAsset={onClearZone}
                         onRotate={(degrees) => onRotateZone(zone.id, degrees)}
                       />
                     ))}
 
-                {/* Forbidden Zones - nur beim Bewegen */}
-                {zoneDrag &&
-                  getForbiddenZonesForImage(activeWorkwearIndex).map(
-                    (forbiddenZone, index) => (
-                      <div
-                        key={`forbidden-${index}`}
-                        style={{
-                          left: forbiddenZone.x + "%",
-                          top: forbiddenZone.y + "%",
-                          width: forbiddenZone.w + "%",
-                          height: forbiddenZone.h + "%",
-                        }}
-                        className="absolute bg-red-500/30 border-2 border-red-500 pointer-events-none"
-                        title="Antizone - Gesperrter Bereich"
-                      />
-                    )
-                  )}
               </div>
             </div>
 
-            {/* Thumbnail Gallery */}
             <div className="mt-5 flex justify-center">
               <div
                 ref={thumbnailStripRef}

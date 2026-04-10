@@ -1,6 +1,5 @@
 import {
-  getInitialZonePositionsForImage,
-  INITIAL_ZONE_RECT,
+  getZoneTemplatesForImage,
 } from "../constants";
 import type { ZoneRectangle } from "../types";
 
@@ -12,29 +11,19 @@ export function clamp(value: number, min: number, max: number) {
 }
 
 /**
- * Clamps zone width between 7.5 and 15, rounded to 1 decimal place
- */
-export function clampZoneWidth(width: number) {
-  return Number(clamp(width, 7.5, 15).toFixed(1));
-}
-
-/**
  * Creates a new zone at a grid position with 2-column layout
  */
 export function createZone(index: number, imageIndex: number): ZoneRectangle {
-  const gap = 2;
-  const clampedWidth = clampZoneWidth(INITIAL_ZONE_RECT.w);
-  const clampedHeight = Number(
-    (clampedWidth * (INITIAL_ZONE_RECT.h / INITIAL_ZONE_RECT.w)).toFixed(1)
-  );
+  const zoneTemplate = getZoneTemplatesForImage(imageIndex)[index - 1];
+  if (zoneTemplate) {
+    const clampedWidth = Number(clamp(zoneTemplate.w, 0.5, 100).toFixed(1));
+    const clampedHeight = Number(clamp(zoneTemplate.h, 0.5, 100).toFixed(1));
 
-  const explicitPosition = getInitialZonePositionsForImage(imageIndex)[index - 1];
-  if (explicitPosition) {
     return {
       id: "zone-" + index,
       label: "Zone " + index,
-      x: clamp(explicitPosition.x, 0, 100 - clampedWidth),
-      y: clamp(explicitPosition.y, 0, 100 - clampedHeight),
+      x: clamp(zoneTemplate.x, 0, 100 - clampedWidth),
+      y: clamp(zoneTemplate.y, 0, 100 - clampedHeight),
       w: clampedWidth,
       h: clampedHeight,
       scale: 1,
@@ -44,20 +33,13 @@ export function createZone(index: number, imageIndex: number): ZoneRectangle {
     };
   }
 
-  const zeroBasedIndex = index - 1;
-  const column = zeroBasedIndex % 2;
-  const row = Math.floor(zeroBasedIndex / 2);
-
-  const stepX = clampedWidth + gap;
-  const stepY = clampedHeight + gap;
-
   return {
     id: "zone-" + index,
     label: "Zone " + index,
-    x: clamp(INITIAL_ZONE_RECT.x + column * stepX, 0, 100 - clampedWidth),
-    y: clamp(INITIAL_ZONE_RECT.y + row * stepY, 0, 100 - clampedHeight),
-    w: clampedWidth,
-    h: clampedHeight,
+    x: 0,
+    y: 0,
+    w: 10,
+    h: 6,
     scale: 1,
     rotation: 0,
     assetId: null,

@@ -5,7 +5,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
   DndContext,
@@ -53,19 +52,11 @@ export default function Konfigurator() {
     selectedZoneId,
     setSelectedZoneId,
     selectedZone,
-    zoneDrag,
     zoneCounterRef,
     previewFrameRef,
-    updateZoneSize,
     rotateArtwork,
     rotateZoneById,
     clearZone,
-    handleZoneDragStart,
-    handleZoneDragMove,
-    handleZoneDragEnd,
-    handleZoneResizeStart,
-    handleZoneResizeMove,
-    handleZoneResizeEnd,
   } = useZoneState(
     initialWorkwearZoneState.zones,
     initialWorkwearZoneState.selectedZoneId,
@@ -114,7 +105,6 @@ export default function Konfigurator() {
     activeWorkwearIndex,
     setZones,
     setSelectedZoneId,
-    setActiveWorkwearIndex,
     setAvailableImageIndexes,
     zoneCounterRef,
     workwearStateRef,
@@ -144,11 +134,6 @@ export default function Konfigurator() {
   }, [availableImageIndexes, productImageIndexes]);
 
   const maxZonesForCurrentImage = getMaxZonesForImage(activeWorkwearIndex);
-
-  // Handle custom zone drag move with forbidden zones validation
-  const handleZoneDragMoveWithValidation = (event: ReactPointerEvent<HTMLDivElement>) => {
-    handleZoneDragMove(event, activeWorkwearIndex);
-  };
 
   // Assign asset to zone with proper callbacks
   const assignAssetToSelectedZone = (assetId: string) => {
@@ -309,45 +294,36 @@ export default function Konfigurator() {
             />
           ) : (
             <DndContext sensors={sensors} onDragEnd={handleDragEndWithAssignment}>
-              <div className="mt-8 grid items-start gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
-                <div className="lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
-                  <KonfiguratorSidebar
-                    assets={assets}
-                    zones={zones}
-                    selectedZone={selectedZone}
-                    selectedAsset={
-                      selectedZone?.assetId ? assetMap.get(selectedZone.assetId) : undefined
-                    }
-                    maxZonesForCurrentImage={maxZonesForCurrentImage}
-                    previewOnly={previewOnly}
-                    isPreparingDraft={isPreparingDraft}
-                    draftPreparationError={draftPreparationError}
-                    draftPreparationSuccess={draftPreparationSuccess}
-                    printMaterial={printMaterial}
-                    onSelectedZoneChange={setSelectedZoneId}
-                    onAssetAssign={assignAssetToSelectedZone}
-                    onAssetRemove={removeAssetWithChainCleanup}
-                    onUploadModalOpen={() => setIsUploadModalOpen(true)}
-                    onTutorialOpen={() => setIsTutorialOpen(true)}
-                    onPreviewOnlyToggle={() => setPreviewOnly((prev) => !prev)}
-                    onRotateLeft={() => rotateArtwork(-5)}
-                    onRotateRight={() => rotateArtwork(5)}
-                    onZoneSizeDecrease={() =>
-                      updateZoneSize((selectedZone?.w ?? 11.3) - 1)
-                    }
-                    onZoneSizeincrease={() =>
-                      updateZoneSize((selectedZone?.w ?? 11.3) + 1)
-                    }
-                    onZoneSizeChange={updateZoneSize}
-                    onClearZone={clearZone}
-                    onPrintMaterialChange={setPrintMaterial}
-                    onPrepareDraft={prepareDraftAndOpenMainForm}
-                    onBackToSelection={() => {
-                      saveCurrentWorkwearState(activeWorkwearIndex);
-                      setHasStartedConfigurator(false);
-                    }}
-                  />
-                </div>
+              <div className="mt-8 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+                <KonfiguratorSidebar
+                  assets={assets}
+                  zones={zones}
+                  selectedZone={selectedZone}
+                  selectedAsset={
+                    selectedZone?.assetId ? assetMap.get(selectedZone.assetId) : undefined
+                  }
+                  maxZonesForCurrentImage={maxZonesForCurrentImage}
+                  previewOnly={previewOnly}
+                  isPreparingDraft={isPreparingDraft}
+                  draftPreparationError={draftPreparationError}
+                  draftPreparationSuccess={draftPreparationSuccess}
+                  printMaterial={printMaterial}
+                  onSelectedZoneChange={setSelectedZoneId}
+                  onAssetAssign={assignAssetToSelectedZone}
+                  onAssetRemove={removeAssetWithChainCleanup}
+                  onUploadModalOpen={() => setIsUploadModalOpen(true)}
+                  onTutorialOpen={() => setIsTutorialOpen(true)}
+                  onPreviewOnlyToggle={() => setPreviewOnly((prev) => !prev)}
+                  onRotateLeft={() => rotateArtwork(-5)}
+                  onRotateRight={() => rotateArtwork(5)}
+                  onClearZone={clearZone}
+                  onPrintMaterialChange={setPrintMaterial}
+                  onPrepareDraft={prepareDraftAndOpenMainForm}
+                  onBackToSelection={() => {
+                    saveCurrentWorkwearState(activeWorkwearIndex);
+                    setHasStartedConfigurator(false);
+                  }}
+                />
 
                 <div
                   ref={(node) => {
@@ -362,17 +338,10 @@ export default function Konfigurator() {
                     previewOnly={previewOnly}
                     isOverPreview={isOverPreview}
                     visibleProductImageIndexes={visibleProductImageIndexes}
-                    zoneDrag={zoneDrag}
                     previewFrameRef={previewFrameRef}
                     thumbnailStripRef={thumbnailStripRef}
                     onSelectZone={setSelectedZoneId}
                     onSelectWorkwearImage={selectWorkwearImage}
-                    onZoneDragStart={handleZoneDragStart}
-                    onZoneDragMove={handleZoneDragMoveWithValidation}
-                    onZoneDragEnd={handleZoneDragEnd}
-                    onZoneResizeStart={handleZoneResizeStart}
-                    onZoneResizeMove={handleZoneResizeMove}
-                    onZoneResizeEnd={handleZoneResizeEnd}
                     onClearZone={clearZone}
                     onRotateZone={rotateZoneById}
                   />

@@ -22,25 +22,4 @@ export type ZoneRectangle = {
   artworkOffset: Point;
 };
 
-export type ZoneDragState = {
-  zoneId: string;
-  pointerId: number;
-  startPointerX: number;
-  startPointerY: number;
-  startZoneX: number;
-  startZoneY: number;
-};
-
-export type ZoneResizeState = {
-  zoneId: string;
-  pointerId: number;
-  corner: 'tl' | 'tr' | 'bl' | 'br';
-  startPointerX: number;
-  startPointerY: number;
-  startZoneX: number;
-  startZoneY: number;
-  startZoneW: number;
-  startZoneH: number;
-};
-
 export type PrintMaterial = "druck" | "stick";

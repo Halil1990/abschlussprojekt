@@ -2,7 +2,6 @@
 
 import type { Asset, ZoneRectangle, PrintMaterial } from "../types";
 import DraggableAssetCard from "./DraggableAssetCard";
-import { INITIAL_ZONE_RECT } from "../constants";
 
 interface KonfiguratorSidebarProps {
   assets: Asset[];
@@ -23,9 +22,6 @@ interface KonfiguratorSidebarProps {
   onPreviewOnlyToggle: () => void;
   onRotateLeft: () => void;
   onRotateRight: () => void;
-  onZoneSizeDecrease: () => void;
-  onZoneSizeincrease: () => void;
-  onZoneSizeChange: (width: number) => void;
   onClearZone: (zoneId: string) => void;
   onPrintMaterialChange: (material: PrintMaterial) => void;
   onPrepareDraft: () => void;
@@ -51,9 +47,6 @@ export function KonfiguratorSidebar({
   onPreviewOnlyToggle,
   onRotateLeft,
   onRotateRight,
-  onZoneSizeDecrease,
-  onZoneSizeincrease,
-  onZoneSizeChange,
   onClearZone,
   onPrintMaterialChange,
   onPrepareDraft,
@@ -73,7 +66,7 @@ export function KonfiguratorSidebar({
         </button>
       </div>
       <p className="mt-1 pt-5 text-sm text-white/80">
-        Logo per Drag and Drop oder Klick einer Zone zuweisen.
+        Logo per Drag and Drop oder Klick einer festen Zone zuweisen.
       </p>
       <p className="mt-1 text-xs text-white/70">
         Zonen pro Bild: {zones.length} / {maxZonesForCurrentImage}
@@ -163,35 +156,6 @@ export function KonfiguratorSidebar({
             disabled={!selectedAsset}
           >
             ↻ Rechts
-          </button>
-        </div>
-
-        <div className="mt-4 flex items-center gap-2">
-          <button
-            type="button"
-            className="h-9 w-9 rounded-lg bg-white/10 text-white disabled:opacity-40"
-            onClick={onZoneSizeDecrease}
-            disabled={!selectedZone}
-          >
-            -
-          </button>
-          <input
-            type="range"
-            min={7.5}
-            max={15}
-            step={0.5}
-            value={selectedZone?.w ?? INITIAL_ZONE_RECT.w}
-            onChange={(event) => onZoneSizeChange(Number(event.target.value))}
-            disabled={!selectedZone}
-            className="w-full accent-orange-400 disabled:opacity-40"
-          />
-          <button
-            type="button"
-            className="h-9 w-9 rounded-lg bg-white/10 text-white disabled:opacity-40"
-            onClick={onZoneSizeincrease}
-            disabled={!selectedZone}
-          >
-            +
           </button>
         </div>
 
