@@ -18,8 +18,8 @@ export default function ProductSelectionSection({
 }: ProductSelectionSectionProps) {
   return (
     <>
-      <p className="mx-auto mt-3 max-w-2xl text-center text-white/75">
-        Bitte Produkt auswaehlen und danach im Konfigurator bearbeiten.
+      <p className="mx-auto mt-3 max-w-2xl text-center text-black">
+        Bitte Produkt auswählen und danach im Konfigurator bearbeiten.
       </p>
 
       <section className="mx-auto mt-8 max-w-5xl rounded-3xl border border-white/15 bg-black/45 p-5 sm:p-7">
