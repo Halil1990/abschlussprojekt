@@ -1,5 +1,5 @@
 const STORAGE_BASE_URL = (process.env.NEXT_PUBLIC_WORKWEAR_BASE_URL || '').replace(/\/+$/, '');
-const IMAGE_VERSION = process.env.NEXT_PUBLIC_WORKWEAR_IMAGE_VERSION || String(Date.now());
+const IMAGE_VERSION = process.env.NEXT_PUBLIC_WORKWEAR_IMAGE_VERSION || '';
 const WORKWEAR_VIEW_FILENAMES = [
   'vorne.jpg',
   'hinten.jpg',
