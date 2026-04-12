@@ -314,18 +314,20 @@ export default function Konfigurator() {
     <>
       <Navbar />
       <main className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed px-4 pb-16 pt-8 sm:px-6 sm:pt-10">
-        <button
-          type="button"
-          onClick={() => setIsTutorialOpen(true)}
-          className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.86),rgba(20,20,20,0.72))] px-4 py-3 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-[linear-gradient(160deg,rgba(24,24,24,0.92),rgba(34,34,34,0.78))] sm:bottom-6 sm:right-6"
-          aria-label="Tutorial öffnen"
-        >
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-nordwerk-orange text-base text-black shadow-sm">
-            ?
-          </span>
-          <span className="hidden sm:inline">Tutorial öffnen</span>
-          <span className="sm:hidden">Hilfe</span>
-        </button>
+        {hasStartedConfigurator ? (
+          <button
+            type="button"
+            onClick={() => setIsTutorialOpen(true)}
+            className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.86),rgba(20,20,20,0.72))] px-4 py-3 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-[linear-gradient(160deg,rgba(24,24,24,0.92),rgba(34,34,34,0.78))] sm:bottom-6 sm:right-6"
+            aria-label="Tutorial öffnen"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-nordwerk-orange text-base text-black shadow-sm">
+              ?
+            </span>
+            <span className="hidden sm:inline">Tutorial öffnen</span>
+            <span className="sm:hidden">Hilfe</span>
+          </button>
+        ) : null}
 
         <div className="mx-auto max-w-7xl">
           <h1 className="hidden text-center text-3xl text-black md:block md:text-4xl">
@@ -435,10 +437,12 @@ export default function Konfigurator() {
         onClose={() => setIsUploadModalOpen(false)}
         onFilesSelected={handleFiles}
       />
-      <TutorialModal
-        isOpen={isTutorialOpen}
-        onClose={() => setIsTutorialOpen(false)}
-      />
+      {hasStartedConfigurator ? (
+        <TutorialModal
+          isOpen={isTutorialOpen}
+          onClose={() => setIsTutorialOpen(false)}
+        />
+      ) : null}
     </>
   );
 }
