@@ -55,7 +55,7 @@ export function KonfiguratorPartners({ activeProduct }: KonfiguratorPartnersProp
               alt={partner.alt}
               width={220}
               height={120}
-              className="h-20 w-auto object-contain"
+              className="h-20 w-auto rounded-lg object-contain"
             />
           </div>
         ))}
