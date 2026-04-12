@@ -1,4 +1,5 @@
 const STORAGE_BASE_URL = (process.env.NEXT_PUBLIC_WORKWEAR_BASE_URL || '').replace(/\/+$/, '');
+// Keep cache key stable across reloads; only bust cache via explicit env version.
 const IMAGE_VERSION = process.env.NEXT_PUBLIC_WORKWEAR_IMAGE_VERSION || '';
 const WORKWEAR_VIEW_FILENAMES = [
   'vorne.jpg',
@@ -15,6 +16,9 @@ export type ZoneTemplate = {
   y: number;
   w: number;
   h: number;
+  rotation?: number;
+  artworkMovable?: boolean;
+  artworkScalable?: boolean;
 };
 
 export const WORKWEAR_PRODUCTS = [
@@ -204,17 +208,17 @@ export const ZONE_TEMPLATES_BY_PRODUCT_AND_VIEW: Record<
 > = {
   jacke: {
     vorne: [
-      { x: 30, y: 37, w: 12, h: 7.2 },
+      { x: 30, y: 37, w: 12, h: 7.2, artworkScalable: true },
     ],
     hinten: [
       { x: 47, y: 18, w: 8, h: 2.7 },
-      { x: 24, y: 28, w: 52, h: 34.7 },
+      { x: 24, y: 28, w: 52, h: 34.7, artworkMovable: true, artworkScalable: true },
     ],
     links: [
-      { x: 50, y: 42, w: 9.5, h: 9.5 },
+      { x: 50, y: 42.8, w: 12, h: 9, rotation: -7 },
     ],
     rechts: [
-      { x: 33, y: 42, w: 9.5, h: 9.5 },
+      { x: 37.5, y: 42, w: 12, h: 9 },
     ],
   },
   hose: {

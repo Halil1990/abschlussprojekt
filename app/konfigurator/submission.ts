@@ -66,15 +66,18 @@ function drawArtworkInZone(
   const zoneWidth = (zone.w / 100) * SNAPSHOT_WIDTH;
   const zoneHeight = (zone.h / 100) * SNAPSHOT_HEIGHT;
 
+  const zoneCenterX = zoneX + zoneWidth / 2;
+  const zoneCenterY = zoneY + zoneHeight / 2;
+
   context.save();
+  context.translate(zoneCenterX, zoneCenterY);
+  context.rotate(((zone.zoneRotation || 0) * Math.PI) / 180);
+
   context.beginPath();
-  context.rect(zoneX, zoneY, zoneWidth, zoneHeight);
+  context.rect(-zoneWidth / 2, -zoneHeight / 2, zoneWidth, zoneHeight);
   context.clip();
 
-  context.translate(
-    zoneX + zoneWidth / 2 + zone.artworkOffset.x,
-    zoneY + zoneHeight / 2 + zone.artworkOffset.y,
-  );
+  context.translate(zone.artworkOffset.x, zone.artworkOffset.y);
   context.rotate((zone.rotation * Math.PI) / 180);
   context.scale(zone.scale, zone.scale);
 

@@ -1,6 +1,9 @@
 import { useState, useRef, useCallback } from "react";
 import type { ZoneRectangle } from "../types";
 
+const MIN_ARTWORK_SCALE = 0.6;
+const MAX_ARTWORK_SCALE = 1.8;
+
 export function useZoneState(initialZones: ZoneRectangle[], initialSelectedZoneId: string) {
   const [zones, setZones] = useState<ZoneRectangle[]>(initialZones);
   const [selectedZoneId, setSelectedZoneId] = useState(initialSelectedZoneId);
@@ -58,6 +61,35 @@ export function useZoneState(initialZones: ZoneRectangle[], initialSelectedZoneI
     [updateZone]
   );
 
+  const scaleZoneById = useCallback(
+    (zoneId: string, delta: number) => {
+      updateZone(zoneId, (zone) => {
+        const nextScale = Math.max(
+          MIN_ARTWORK_SCALE,
+          Math.min(MAX_ARTWORK_SCALE, zone.scale + delta),
+        );
+        return {
+          ...zone,
+          scale: Number(nextScale.toFixed(2)),
+        };
+      });
+    },
+    [updateZone]
+  );
+
+  const setZoneArtworkOffset = useCallback(
+    (zoneId: string, nextOffset: { x: number; y: number }) => {
+      updateZone(zoneId, (zone) => ({
+        ...zone,
+        artworkOffset: {
+          x: Number(nextOffset.x.toFixed(1)),
+          y: Number(nextOffset.y.toFixed(1)),
+        },
+      }));
+    },
+    [updateZone]
+  );
+
   return {
     zones,
     setZones,
@@ -71,5 +103,7 @@ export function useZoneState(initialZones: ZoneRectangle[], initialSelectedZoneI
     clearZone,
     rotateArtwork,
     rotateZoneById,
+    scaleZoneById,
+    setZoneArtworkOffset,
   };
 }

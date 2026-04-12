@@ -27,7 +27,6 @@ import { TutorialModal } from "./components/TutorialModal";
 import { KonfiguratorPartners } from "./components/KonfiguratorPartners";
 import {
   DEFAULT_WORKWEAR_INDEX,
-  getMaxZonesForImage,
   WORKWEAR_VIEWS_PER_PRODUCT,
   PREVIEW_DROP_ID,
   type WorkwearProductId,
@@ -61,6 +60,8 @@ export default function Konfigurator() {
     previewFrameRef,
     rotateArtwork,
     rotateZoneById,
+    scaleZoneById,
+    setZoneArtworkOffset,
     clearZone,
   } = useZoneState(
     initialWorkwearZoneState.zones,
@@ -138,8 +139,6 @@ export default function Konfigurator() {
     if (!availableImageIndexes) return productImageIndexes;
     return productImageIndexes.filter((index) => availableImageIndexes.has(index));
   }, [availableImageIndexes, productImageIndexes]);
-
-  const maxZonesForCurrentImage = getMaxZonesForImage(activeWorkwearIndex);
 
   // Assign asset to zone with proper callbacks
   const assignAssetToSelectedZone = (assetId: string) => {
@@ -252,6 +251,7 @@ export default function Konfigurator() {
 
   // Start configurator for product
   const startConfiguratorForProduct = (product: WorkwearProductId) => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setHasStartedConfigurator(true);
     const startIndex = getWorkwearProductStartIndex(product);
     const productIndexes = Array.from(
@@ -289,10 +289,7 @@ export default function Konfigurator() {
 
   const sidebarProps: React.ComponentProps<typeof KonfiguratorSidebar> = {
     assets,
-    zones,
-    selectedZone,
     selectedAsset: selectedZone?.assetId ? assetMap.get(selectedZone.assetId) : undefined,
-    maxZonesForCurrentImage,
     previewOnly,
     isPreparingDraft,
     draftPreparationError,
@@ -301,11 +298,9 @@ export default function Konfigurator() {
     onAssetAssign: assignAssetToSelectedZone,
     onAssetRemove: removeAssetWithChainCleanup,
     onUploadModalOpen: () => setIsUploadModalOpen(true),
-    onTutorialOpen: () => setIsTutorialOpen(true),
     onPreviewOnlyToggle: () => setPreviewOnly((prev) => !prev),
     onRotateLeft: () => rotateArtwork(-5),
     onRotateRight: () => rotateArtwork(5),
-    onClearZone: clearZone,
     onPrintMaterialChange: setPrintMaterial,
     onPrepareDraft: prepareDraftAndOpenMainForm,
     onBackToSelection: () => {
@@ -319,9 +314,24 @@ export default function Konfigurator() {
     <>
       <Navbar />
       <main className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed px-4 pb-16 pt-8 sm:px-6 sm:pt-10">
+        {hasStartedConfigurator ? (
+          <button
+            type="button"
+            onClick={() => setIsTutorialOpen(true)}
+            className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.86),rgba(20,20,20,0.72))] px-4 py-3 text-sm font-semibold text-white shadow-[0_16px_40px_rgba(0,0,0,0.35)] backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-[linear-gradient(160deg,rgba(24,24,24,0.92),rgba(34,34,34,0.78))] sm:bottom-6 sm:right-6"
+            aria-label="Tutorial öffnen"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-nordwerk-orange text-base text-black shadow-sm">
+              ?
+            </span>
+            <span className="hidden sm:inline">Tutorial öffnen</span>
+            <span className="sm:hidden">Hilfe</span>
+          </button>
+        ) : null}
+
         <div className="mx-auto max-w-7xl">
-          <h1 className="text-center text-3xl text-black sm:text-4xl">
-           Die Konfiguration dient als Grundlage für deine Anfrage.
+          <h1 className="hidden text-center text-3xl text-black md:block md:text-4xl">
+            Die Konfiguration dient als Grundlage für deine Anfrage.
             <br />
             Nach Prüfung erhältst du ein individuelles Angebot.
           </h1>
@@ -391,6 +401,8 @@ export default function Konfigurator() {
                       onSelectWorkwearImage={selectWorkwearImage}
                       onClearZone={clearZone}
                       onRotateZone={rotateZoneById}
+                      onScaleZone={scaleZoneById}
+                      onMoveArtworkInZone={setZoneArtworkOffset}
                       onOpenTools={() => setIsSidebarOpen(true)}
                     />
                   </div>
@@ -425,10 +437,12 @@ export default function Konfigurator() {
         onClose={() => setIsUploadModalOpen(false)}
         onFilesSelected={handleFiles}
       />
-      <TutorialModal
-        isOpen={isTutorialOpen}
-        onClose={() => setIsTutorialOpen(false)}
-      />
+      {hasStartedConfigurator ? (
+        <TutorialModal
+          isOpen={isTutorialOpen}
+          onClose={() => setIsTutorialOpen(false)}
+        />
+      ) : null}
     </>
   );
 }

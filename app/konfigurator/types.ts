@@ -16,10 +16,13 @@ export type ZoneRectangle = {
   y: number;
   w: number;
   h: number;
+  zoneRotation: number;
   scale: number;
   rotation: number;
   assetId: string | null;
   artworkOffset: Point;
+  artworkMovable?: boolean;
+  artworkScalable?: boolean;
 };
 
 export type PrintMaterial = "druck" | "stick";
