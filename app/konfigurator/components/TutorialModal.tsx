@@ -40,23 +40,12 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
 
           {/* Content */}
           <div className="px-6 py-8 sm:px-8 space-y-6">
-            {/* Step 1 */}
-            <div className="flex gap-4">
-              <div className="shrink-0 text-3xl">👕</div>
-              <div>
-                <h3 className="font-bold text-black text-lg">1. Produkt & Seite wählen</h3>
-                <p className="text-black/70 text-sm mt-1">Jacke, Hose, Weste oder Latzhose. Wechsle Seiten über die Thumbnails unten rechts.</p>
-              </div>
-            </div>
-
-            <div className="h-px bg-black/10" />
-
             {/* Step 2 */}
             <div className="flex gap-4">
               <div className="shrink-0 text-3xl">⬆️</div>
               <div>
-                <h3 className="font-bold text-black text-lg">2. Logo hochladen</h3>
-                <p className="text-black/70 text-sm mt-1">&quot;+ Bilder hochladen&quot; → PNG, JPG, WebP wählen. Logo erscheint in der Liste links.</p>
+                <h3 className="font-bold text-black text-lg">1. Logo hochladen</h3>
+                <p className="text-black/70 text-sm mt-1">Mit &quot;+ Bilder hochladen&quot; PNG, JPG oder WebP auswählen. Deine Dateien erscheinen in der Seitenleiste.</p>
               </div>
             </div>
 
@@ -66,8 +55,8 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
             <div className="flex gap-4">
               <div className="shrink-0 text-3xl">🖱️</div>
               <div>
-                <h3 className="font-bold text-black text-lg">3. Logo auf Produkt platzieren</h3>
-                <p className="text-black/70 text-sm mt-1">Drag & Drop: Logo per Maus ziehen. Oder: Zone selecten + auf Logo klicken.</p>
+                <h3 className="font-bold text-black text-lg">2. Feste Zone belegen</h3>
+                <p className="text-black/70 text-sm mt-1">Zone in der Vorschau anklicken und Logo per Drag &amp; Drop oder per Klick auf die Asset-Karte zuweisen.</p>
               </div>
             </div>
 
@@ -75,10 +64,10 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
 
             {/* Step 4 */}
             <div className="flex gap-4">
-              <div className="shrink-0 text-3xl">🎚️</div>
+              <div className="shrink-0 text-3xl">🧭</div>
               <div>
-                <h3 className="font-bold text-black text-lg">4. Drehen, Vergrößern, Verschieben</h3>
-                <p className="text-black/70 text-sm mt-1">Buttons: ↺/↻ zum Drehen. Schieber: Größe ändern (7.5% - 15%). Im Preview: Zone mit Maus bewegen.</p>
+                <h3 className="font-bold text-black text-lg">3. Ansicht wechseln & Logo drehen</h3>
+                <p className="text-black/70 text-sm mt-1">Unten über die Thumbnails zwischen Vorderseite, Rückseite und Seiten wechseln. Mit ↺/↻ drehst du das Logo in der aktiven Zone.</p>
               </div>
             </div>
 
@@ -88,8 +77,8 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
             <div className="flex gap-4">
               <div className="shrink-0 text-3xl">✅</div>
               <div>
-                <h3 className="font-bold text-black text-lg">5. Druckmaterial wählen & Speichern</h3>
-                <p className="text-black/70 text-sm mt-1">Material: Druck oder Stick wählen. &quot;Zum Kontaktformular&quot; klicken → Design gespeichert!</p>
+                <h3 className="font-bold text-black text-lg">4. Material wählen & Anfrage starten</h3>
+                <p className="text-black/70 text-sm mt-1">Druck oder Stick auswählen und auf &quot;Zum Kontaktformular&quot; klicken. Die Konfiguration wird für die Anfrage vorbereitet.</p>
               </div>
             </div>
 
@@ -99,10 +88,10 @@ export function TutorialModal({ isOpen, onClose }: TutorialModalProps) {
                 <span>💡</span> Wichtige Tipps
               </h4>
               <ul className="text-sm text-black/70 space-y-2">
-                <li><strong>Rote Bereiche:</strong> Gesperrte Zonen (z.B. Nähte, Reißverschlüsse)</li>
-                <li><strong>&quot;Nur Bild anzeigen&quot;:</strong> Toggle zum Edit-Modus ein-/ausschalten</li>
-                <li><strong>Mehrere Seiten:</strong> Alle 4 Seiten separat konfigurieren & speichern</li>
-                <li><strong>Selbstgespeichert:</strong> Deine Änderungen speichern automatisch</li>
+                <li><strong>Feste Zonen:</strong> Position und Größe der Zonen sind vorgegeben und können nicht frei verschoben werden.</li>
+                <li><strong>&quot;Nur Bild anzeigen&quot;:</strong> Blendet die Bearbeitungsrahmen aus und zeigt nur dein Ergebnis.</li>
+                <li><strong>Mobil:</strong> Über den Button &quot;Werkzeuge&quot; öffnest du die Seitenleiste.</li>
+                <li><strong>Produktauswahl:</strong> Mit &quot;Zurück zur Produktauswahl&quot; wechselst du jederzeit auf ein anderes Produkt.</li>
               </ul>
             </div>
           </div>

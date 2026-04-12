@@ -18,7 +18,6 @@ interface KonfiguratorSidebarProps {
   onAssetAssign: (assetId: string) => void;
   onAssetRemove: (assetId: string) => void;
   onUploadModalOpen: () => void;
-  onTutorialOpen: () => void;
   onPreviewOnlyToggle: () => void;
   onRotateLeft: () => void;
   onRotateRight: () => void;
@@ -40,7 +39,6 @@ export function KonfiguratorSidebar({
   onAssetAssign,
   onAssetRemove,
   onUploadModalOpen,
-  onTutorialOpen,
   onPreviewOnlyToggle,
   onRotateLeft,
   onRotateRight,
@@ -52,20 +50,13 @@ export function KonfiguratorSidebar({
     <aside className="rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-lg font-semibold text-white">
-          So funktioniert’s:{" "}
+          Platzhaltertext
         </h2>
-        <button
-          type="button"
-          onClick={onTutorialOpen}
-          title="Tutorial öffnen"
-          className="rounded-full bg-white/10 p-2 text-white transition hover:bg-white/20"
-        >
-          💡
-        </button>
       </div>
       <p className="mt-1 pt-5 text-sm text-white/80">
         Logo per Drag and Drop oder Klick einer festen Zone zuweisen.
       </p>
+
 
       <button
         type="button"
@@ -180,6 +171,23 @@ export function KonfiguratorSidebar({
 
       <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <p className="font-bold uppercase underline tracking-[0.18em] text-white/70">Bitte geben Sie bei Ihrer Anfrage unbedingt die gewünschte Anzahl sowie die Größen der Kleidungsstücke an, damit wir Ihre Anfrage schnell und korrekt bearbeiten können</p>
+      </div>
+      
+      <div className="mt-4 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
+          Größentabelle
+        </p>
+        <p className="mt-2 text-xs text-white/80">
+          Öffnet die offizielle Kübler-Größentabelle in einem neuen Tab.
+        </p>
+        <a
+          href="https://www.kuebler.eu/service/groessentabelle/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-white/15"
+        >
+          Größentabelle öffnen
+        </a>
       </div>
 
       {/* Anfrage Form */}

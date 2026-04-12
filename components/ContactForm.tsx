@@ -1,19 +1,11 @@
 'use client';
 
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { KONFIGURATOR_SUBMISSION_DRAFT_KEY } from '../app/konfigurator/submissionDraft';
-
-type KonfiguratorSubmissionDraft = {
-  activeWorkwearIndex: number;
-  workwearStateByIndex: Record<string, unknown>;
-  snapshots: Array<{
-    imageIndex: number;
-    imageUrl: string;
-    dataUrl: string;
-  }>;
-  printMaterial: "druck" | "stick";
-  createdAt: string;
-};
+import {
+  KONFIGURATOR_SUBMISSION_DRAFT_KEY,
+  type KonfiguratorSubmissionDraft,
+} from '../app/konfigurator/submissionDraft';
 
 interface FormData {
   name: string;
@@ -34,12 +26,24 @@ export default function ContactForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [hasConfiguratorDraft, setHasConfiguratorDraft] = useState(false);
+  const [configuratorDraft, setConfiguratorDraft] = useState<KonfiguratorSubmissionDraft | null>(null);
+  const [activeSnapshotIndex, setActiveSnapshotIndex] = useState<number | null>(null);
 
   useEffect(() => {
     try {
-      setHasConfiguratorDraft(Boolean(sessionStorage.getItem(KONFIGURATOR_SUBMISSION_DRAFT_KEY)));
+      const rawDraft = sessionStorage.getItem(KONFIGURATOR_SUBMISSION_DRAFT_KEY);
+      if (!rawDraft) {
+        setHasConfiguratorDraft(false);
+        setConfiguratorDraft(null);
+        return;
+      }
+
+      const draft = JSON.parse(rawDraft) as KonfiguratorSubmissionDraft;
+      setHasConfiguratorDraft(true);
+      setConfiguratorDraft(draft);
     } catch {
       setHasConfiguratorDraft(false);
+      setConfiguratorDraft(null);
     }
   }, []);
 
@@ -53,6 +57,17 @@ export default function ContactForm() {
       return () => clearTimeout(timer);
     }
   }, [success, error]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setActiveSnapshotIndex(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -99,6 +114,8 @@ export default function ContactForm() {
         if (draft) {
           sessionStorage.removeItem(KONFIGURATOR_SUBMISSION_DRAFT_KEY);
           setHasConfiguratorDraft(false);
+          setConfiguratorDraft(null);
+          setActiveSnapshotIndex(null);
         }
         setSuccess(true);
         setFormData({ name: '', email: '', phone: '', message: '' });
@@ -122,9 +139,37 @@ export default function ContactForm() {
         </h2>
 
         {hasConfiguratorDraft && (
-          <p className="mb-4 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
-            Ihre Konfiguration wurde uebernommen und wird mit dieser Anfrage gesendet.
-          </p>
+          <div className="mb-4 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-900">
+            <p className="font-medium">Ihre Konfiguration wurde übernommen und wird mit dieser Anfrage gesendet.</p>
+            <p className="mt-1 text-xs text-orange-900/70">
+              Tipp: Auf ein Bild klicken, um es vergrößert anzusehen.
+            </p>
+
+            {configuratorDraft?.snapshots?.length ? (
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {configuratorDraft.snapshots.map((snapshot, index) => (
+                  <button
+                    key={`${snapshot.imageIndex}-${snapshot.imageUrl}`}
+                    type="button"
+                    onClick={() => setActiveSnapshotIndex(index)}
+                    className="overflow-hidden rounded-xl border border-orange-200 bg-white text-left transition hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <div className="flex items-center justify-center bg-orange-50 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-orange-900/70">
+                      Vorschau {snapshot.imageIndex + 1} - Klick für Großansicht
+                    </div>
+                    <Image
+                      src={snapshot.dataUrl}
+                      alt={`Konfigurierte Vorschau ${snapshot.imageIndex + 1}`}
+                      width={768}
+                      height={1320}
+                      unoptimized
+                      className="h-40 w-full bg-white object-contain"
+                    />
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
         )}
 
         <form
@@ -189,6 +234,51 @@ export default function ContactForm() {
           )}
         </form>
       </div>
+
+      {hasConfiguratorDraft && activeSnapshotIndex !== null && configuratorDraft?.snapshots?.[activeSnapshotIndex] ? (
+        <div
+          className="fixed inset-0 flex items-start justify-center overflow-y-auto px-4 pb-4 pt-24 sm:pt-28"
+          style={{ zIndex: 9999 }}
+        >
+          <button
+            type="button"
+            aria-label="Großansicht schließen"
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setActiveSnapshotIndex(null)}
+          />
+
+          <div className="relative z-10 w-full max-w-5xl overflow-hidden rounded-3xl border border-white/15 bg-white shadow-2xl">
+            <div className="flex items-center justify-between gap-4 border-b border-gray-200 px-4 py-3 sm:px-6">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
+                  Großansicht
+                </p>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Vorschau {configuratorDraft.snapshots[activeSnapshotIndex].imageIndex + 1}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveSnapshotIndex(null)}
+                className="rounded-full border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
+              >
+                Schließen
+              </button>
+            </div>
+
+            <div className="bg-gray-50 p-4 sm:p-6">
+              <Image
+                src={configuratorDraft.snapshots[activeSnapshotIndex].dataUrl}
+                alt={`Großansicht Konfigurierte Vorschau ${configuratorDraft.snapshots[activeSnapshotIndex].imageIndex + 1}`}
+                width={768}
+                height={1320}
+                unoptimized
+                className="max-h-[80vh] w-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }
