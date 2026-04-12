@@ -1,14 +1,11 @@
 "use client";
 
-import type { Asset, ZoneRectangle, PrintMaterial } from "../types";
+import type { Asset, PrintMaterial } from "../types";
 import DraggableAssetCard from "./DraggableAssetCard";
 
 interface KonfiguratorSidebarProps {
   assets: Asset[];
-  zones: ZoneRectangle[];
-  selectedZone: ZoneRectangle | null;
   selectedAsset: Asset | undefined;
-  maxZonesForCurrentImage: number;
   printMaterialInputName?: string;
   previewOnly: boolean;
   isPreparingDraft: boolean;
@@ -21,7 +18,6 @@ interface KonfiguratorSidebarProps {
   onPreviewOnlyToggle: () => void;
   onRotateLeft: () => void;
   onRotateRight: () => void;
-  onClearZone: (zoneId: string) => void;
   onPrintMaterialChange: (material: PrintMaterial) => void;
   onPrepareDraft: () => void;
   onBackToSelection: () => void;
@@ -48,10 +44,6 @@ export function KonfiguratorSidebar({
 }: KonfiguratorSidebarProps) {
   return (
     <aside className="rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
-      <div className="flex items-center justify-between gap-3">
-      </div>
-
-
       <button
         type="button"
         onClick={onUploadModalOpen}
@@ -109,23 +101,6 @@ export function KonfiguratorSidebar({
         >
           {previewOnly ? "Bearbeitung anzeigen" : "Nur Bild anzeigen"}
         </button>
-
-        {/* bild entfernen button zeile 138-152 */}
-        {/* <div className="mt-3 flex items-center justify-center gap-3">
-          {selectedAsset ? (
-            <button
-              type="button"
-              onClick={() => {
-                if (selectedZone) {
-                  onClearZone(selectedZone.id);
-                }
-              }}
-              className="rounded-lg border border-red-300/35 px-3 py-2 text-xs font-medium text-red-200 transition hover:border-red-200/60 hover:text-white"
-            >
-              Bild Entfernen
-            </button>
-          ) : null}
-        </div> */}
       </div>
 
       {/* Druckmaterial */}

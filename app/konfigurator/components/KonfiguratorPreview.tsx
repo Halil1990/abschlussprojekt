@@ -49,7 +49,6 @@ export function KonfiguratorPreview({
 }: KonfiguratorPreviewProps) {
   const activeProduct = getWorkwearProductByIndex(activeWorkwearIndex);
   const activeWorkwearImage = WORKWEAR_IMAGES[activeWorkwearIndex];
-  // const activeSideLabel = getWorkwearSideLabel(activeWorkwearImage);
 
   return (
     <section className="mx-auto w-full max-w-240 rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
@@ -63,9 +62,6 @@ export function KonfiguratorPreview({
         </button>
         <h2 className="text-lg font-semibold text-white">Vorschau</h2>
       </div>
-      {/* <p className="mt-1 pt-5 text-sm text-white/80">
-        {getWorkwearProductShortLabel(activeProduct)} - {activeSideLabel}
-      </p> */}
 
       <div className="mt-4 mx-auto w-full max-w-180 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <div className="mx-auto max-w-155">
@@ -82,6 +78,8 @@ export function KonfiguratorPreview({
                 <img
                   src={activeWorkwearImage}
                   alt={`Workwear ${getWorkwearProductShortLabel(activeProduct)}`}
+                  fetchPriority="high"
+                  decoding="async"
                   className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
                 />
 
@@ -174,6 +172,8 @@ export function KonfiguratorPreview({
                     <img
                       src={imageUrl}
                       alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
+                      loading="lazy"
+                      decoding="async"
                       className="h-full w-full object-cover"
                     />
                   </button>

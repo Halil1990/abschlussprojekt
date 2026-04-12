@@ -35,33 +35,7 @@ export function useWorkwearPersistence(
 
   // Check which images are available
   useEffect(() => {
-    let isCancelled = false;
-
-    const checks = WORKWEAR_IMAGES.map((imageUrl, index) =>
-      new Promise<number | null>((resolve) => {
-        const img = new window.Image();
-        img.onload = () => resolve(index);
-        img.onerror = () => resolve(null);
-        img.src = imageUrl;
-      })
-    );
-
-    Promise.all(checks).then((results) => {
-      if (isCancelled) return;
-
-      const nextIndexes = new Set<number>();
-      for (const result of results) {
-        if (typeof result === "number") {
-          nextIndexes.add(result);
-        }
-      }
-
-      onSetAvailableImageIndexes(nextIndexes);
-    });
-
-    return () => {
-      isCancelled = true;
-    };
+    onSetAvailableImageIndexes(new Set(WORKWEAR_IMAGES.map((_, index) => index)));
   }, [onSetAvailableImageIndexes]);
 
   const saveCurrentWorkwearState = useCallback(

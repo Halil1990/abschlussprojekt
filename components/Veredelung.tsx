@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 
 export default function Veredelung() {
@@ -9,17 +9,17 @@ export default function Veredelung() {
 
   const placementImages = ['/vorne.png', '/Rücken.png', '/Seite.png', '/hemd.png'];
 
-  const goNext = () => {
+  const goNext = useCallback(() => {
     if (placementIndex !== null) {
       setPlacementIndex((placementIndex + 1) % placementImages.length);
     }
-  };
+  }, [placementIndex, placementImages.length]);
 
-  const goPrev = () => {
+  const goPrev = useCallback(() => {
     if (placementIndex !== null) {
       setPlacementIndex((placementIndex - 1 + placementImages.length) % placementImages.length);
     }
-  };
+  }, [placementIndex, placementImages.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -40,7 +40,7 @@ export default function Veredelung() {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
-  }, [lightboxOpen, placementIndex]);
+  }, [lightboxOpen, placementIndex, goNext, goPrev]);
 
   return (
     <section id="veredelung" className="py-12 sm:py-16 md:py-24 px-4 sm:px-6">

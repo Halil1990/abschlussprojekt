@@ -88,6 +88,8 @@ export default function ProductSelectionSection({
                       <img
                         src={previewImage}
                         alt={`${productLabel} Vorschau in ${selectedColorLabel}`}
+                        loading="lazy"
+                        decoding="async"
                         className="pointer-events-none h-full w-full select-none object-contain"
                         onError={() => {
                           setFailedColorImageKeySet((prev) => {

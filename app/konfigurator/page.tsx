@@ -27,7 +27,6 @@ import { TutorialModal } from "./components/TutorialModal";
 import { KonfiguratorPartners } from "./components/KonfiguratorPartners";
 import {
   DEFAULT_WORKWEAR_INDEX,
-  getMaxZonesForImage,
   WORKWEAR_VIEWS_PER_PRODUCT,
   PREVIEW_DROP_ID,
   type WorkwearProductId,
@@ -140,8 +139,6 @@ export default function Konfigurator() {
     if (!availableImageIndexes) return productImageIndexes;
     return productImageIndexes.filter((index) => availableImageIndexes.has(index));
   }, [availableImageIndexes, productImageIndexes]);
-
-  const maxZonesForCurrentImage = getMaxZonesForImage(activeWorkwearIndex);
 
   // Assign asset to zone with proper callbacks
   const assignAssetToSelectedZone = (assetId: string) => {
@@ -292,10 +289,7 @@ export default function Konfigurator() {
 
   const sidebarProps: React.ComponentProps<typeof KonfiguratorSidebar> = {
     assets,
-    zones,
-    selectedZone,
     selectedAsset: selectedZone?.assetId ? assetMap.get(selectedZone.assetId) : undefined,
-    maxZonesForCurrentImage,
     previewOnly,
     isPreparingDraft,
     draftPreparationError,
@@ -307,7 +301,6 @@ export default function Konfigurator() {
     onPreviewOnlyToggle: () => setPreviewOnly((prev) => !prev),
     onRotateLeft: () => rotateArtwork(-5),
     onRotateRight: () => rotateArtwork(5),
-    onClearZone: clearZone,
     onPrintMaterialChange: setPrintMaterial,
     onPrepareDraft: prepareDraftAndOpenMainForm,
     onBackToSelection: () => {
