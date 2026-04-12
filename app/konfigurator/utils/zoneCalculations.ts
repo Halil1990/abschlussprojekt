@@ -26,10 +26,13 @@ export function createZone(index: number, imageIndex: number): ZoneRectangle {
       y: clamp(zoneTemplate.y, 0, 100 - clampedHeight),
       w: clampedWidth,
       h: clampedHeight,
+      zoneRotation: Number(zoneTemplate.rotation ?? 0),
       scale: 1,
       rotation: 0,
       assetId: null,
       artworkOffset: { x: 0, y: 0 },
+      artworkMovable: Boolean(zoneTemplate.artworkMovable),
+      artworkScalable: Boolean(zoneTemplate.artworkScalable),
     };
   }
 
@@ -40,9 +43,12 @@ export function createZone(index: number, imageIndex: number): ZoneRectangle {
     y: 0,
     w: 10,
     h: 6,
+    zoneRotation: 0,
     scale: 1,
     rotation: 0,
     assetId: null,
     artworkOffset: { x: 0, y: 0 },
+    artworkMovable: false,
+    artworkScalable: false,
   };
 }

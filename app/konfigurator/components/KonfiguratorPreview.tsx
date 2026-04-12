@@ -24,6 +24,8 @@ interface KonfiguratorPreviewProps {
   onSelectWorkwearImage: (index: number) => void;
   onClearZone: (zoneId: string) => void;
   onRotateZone: (zoneId: string, degrees: number) => void;
+  onScaleZone: (zoneId: string, delta: number) => void;
+  onMoveArtworkInZone: (zoneId: string, nextOffset: { x: number; y: number }) => void;
   onOpenTools: () => void;
 }
 
@@ -41,6 +43,8 @@ export function KonfiguratorPreview({
   onSelectWorkwearImage,
   onClearZone,
   onRotateZone,
+  onScaleZone,
+  onMoveArtworkInZone,
   onOpenTools,
 }: KonfiguratorPreviewProps) {
   const activeProduct = getWorkwearProductByIndex(activeWorkwearIndex);
@@ -96,6 +100,8 @@ export function KonfiguratorPreview({
                             top: zone.y + "%",
                             width: zone.w + "%",
                             height: zone.h + "%",
+                            transform: `rotate(${zone.zoneRotation}deg)`,
+                            transformOrigin: "center",
                           }}
                           className="absolute overflow-hidden"
                         >
@@ -128,6 +134,8 @@ export function KonfiguratorPreview({
                         onSelect={onSelectZone}
                         onClearAsset={onClearZone}
                         onRotate={(degrees) => onRotateZone(zone.id, degrees)}
+                        onScale={(delta) => onScaleZone(zone.id, delta)}
+                        onArtworkOffsetChange={onMoveArtworkInZone}
                       />
                     ))}
 

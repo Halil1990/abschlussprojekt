@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 
+import { useRef } from 'react';
 import { useDroppable } from '@dnd-kit/core';
-import { Trash2, RotateCcw, RotateCw } from 'lucide-react';
+import { Trash2, RotateCcw, RotateCw, ZoomOut, ZoomIn } from 'lucide-react';
 
 import type { Asset, ZoneRectangle } from '../types';
 
@@ -18,6 +19,8 @@ type WorkwearZoneProps = {
   onSelect: (zoneId: string) => void;
   onClearAsset: (zoneId: string) => void;
   onRotate: (degrees: number) => void;
+  onScale: (delta: number) => void;
+  onArtworkOffsetChange: (zoneId: string, nextOffset: { x: number; y: number }) => void;
 };
 
 export default function WorkwearZone({
@@ -29,8 +32,72 @@ export default function WorkwearZone({
   onSelect,
   onClearAsset,
   onRotate,
+  onScale,
+  onArtworkOffsetChange,
 }: WorkwearZoneProps) {
   const { isOver, setNodeRef } = useDroppable({ id: zoneDropPrefix + zone.id });
+  const dragStateRef = useRef<{
+    pointerId: number;
+    startX: number;
+    startY: number;
+    startOffsetX: number;
+    startOffsetY: number;
+    maxOffsetX: number;
+    maxOffsetY: number;
+  } | null>(null);
+  const canMoveArtwork = Boolean(zone.artworkMovable && asset);
+  const canScaleArtwork = Boolean(zone.artworkScalable && asset);
+
+  const handleArtworkPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!canMoveArtwork) return;
+
+    const targetElement = event.currentTarget;
+    const rect = targetElement.getBoundingClientRect();
+
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startOffsetX: zone.artworkOffset.x,
+      startOffsetY: zone.artworkOffset.y,
+      maxOffsetX: rect.width * 0.35,
+      maxOffsetY: rect.height * 0.35,
+    };
+
+    targetElement.setPointerCapture(event.pointerId);
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  const handleArtworkPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const dragState = dragStateRef.current;
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+
+    const deltaX = event.clientX - dragState.startX;
+    const deltaY = event.clientY - dragState.startY;
+    const nextOffsetX = Math.max(
+      -dragState.maxOffsetX,
+      Math.min(dragState.maxOffsetX, dragState.startOffsetX + deltaX),
+    );
+    const nextOffsetY = Math.max(
+      -dragState.maxOffsetY,
+      Math.min(dragState.maxOffsetY, dragState.startOffsetY + deltaY),
+    );
+
+    onArtworkOffsetChange(zone.id, { x: nextOffsetX, y: nextOffsetY });
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+  const handleArtworkPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
+    const dragState = dragStateRef.current;
+    if (!dragState || event.pointerId !== dragState.pointerId) return;
+
+    dragStateRef.current = null;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+    event.preventDefault();
+    event.stopPropagation();
+  };
 
   return (
     <div
@@ -43,6 +110,8 @@ export default function WorkwearZone({
         top: zone.y + '%',
         width: zone.w + '%',
         height: zone.h + '%',
+        transform: `rotate(${zone.zoneRotation}deg)`,
+        transformOrigin: 'center',
       }}
       className={
         'absolute touch-none rounded-md border transition hover:border-nordwerk-orange ' +
@@ -67,6 +136,20 @@ export default function WorkwearZone({
           >
             <RotateCcw size={20} />
           </button>
+          {canScaleArtwork ? (
+            <button
+              type="button"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onScale(-0.05);
+              }}
+              className="text-white hover:text-white/80 transition"
+              title="Logo verkleinern"
+            >
+              <ZoomOut size={20} />
+            </button>
+          ) : null}
           <button
             type="button"
             onPointerDown={(e) => {
@@ -79,6 +162,20 @@ export default function WorkwearZone({
           >
             <Trash2 size={20} />
           </button>
+          {canScaleArtwork ? (
+            <button
+              type="button"
+              onPointerDown={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onScale(0.05);
+              }}
+              className="text-white hover:text-white/80 transition"
+              title="Logo vergrößern"
+            >
+              <ZoomIn size={20} />
+            </button>
+          ) : null}
           <button
             type="button"
             onPointerDown={(e) => {
@@ -102,7 +199,13 @@ export default function WorkwearZone({
           </span>
         </div>
       ) : (
-        <div className="absolute inset-0 z-20">
+        <div
+          className={'absolute inset-0 z-20 ' + (canMoveArtwork ? 'cursor-grab active:cursor-grabbing' : '')}
+          onPointerDown={handleArtworkPointerDown}
+          onPointerMove={handleArtworkPointerMove}
+          onPointerUp={handleArtworkPointerUp}
+          onPointerCancel={handleArtworkPointerUp}
+        >
           <img
             src={asset.src}
             alt={asset.name}
