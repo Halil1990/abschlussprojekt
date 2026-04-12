@@ -321,7 +321,7 @@ export default function Konfigurator() {
       <main className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed px-4 pb-16 pt-8 sm:px-6 sm:pt-10">
         <div className="mx-auto max-w-7xl">
           <h1 className="text-center text-3xl text-black sm:text-4xl">
-            Die Konfiguration dient als Grundlage für deine Anfrage.
+           TEST Die Konfiguration dient als Grundlage für deine Anfrage.
             <br />
             Nach Prüfung erhältst du ein individuelles Angebot.
           </h1>
