@@ -33,9 +33,40 @@ export function useWorkwearPersistence(
     );
   }, [activeWorkwearIndex, selectedZoneId, zones, zoneCounterRef, workwearStateRef]);
 
-  // Check which images are available
+  // Check which images are available by attempting to load them
   useEffect(() => {
-    onSetAvailableImageIndexes(new Set(WORKWEAR_IMAGES.map((_, index) => index)));
+    let isMounted = true;
+    const availableIndexes = new Set<number>();
+    let loadedCount = 0;
+
+    const checkImageAvailability = async () => {
+      const checkPromises = WORKWEAR_IMAGES.map((imageUrl, index) => {
+        return new Promise<void>((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            if (isMounted) {
+              availableIndexes.add(index);
+            }
+            resolve();
+          };
+          img.onerror = () => {
+            resolve();
+          };
+          img.src = imageUrl;
+        });
+      });
+
+      await Promise.all(checkPromises);
+      if (isMounted) {
+        onSetAvailableImageIndexes(availableIndexes.size > 0 ? availableIndexes : null);
+      }
+    };
+
+    checkImageAvailability();
+
+    return () => {
+      isMounted = false;
+    };
   }, [onSetAvailableImageIndexes]);
 
   const saveCurrentWorkwearState = useCallback(
