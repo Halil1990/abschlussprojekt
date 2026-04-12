@@ -129,11 +129,27 @@ export const CUSTOMER_REVIEWS: readonly CustomerReview[] = [
   },
   {
     id: 'review-6',
+    productId: 'weste',
+    name: 'Rolf H.',
+    rating: 4.5,
+    comment: 'Excellent quality! Die Verarbeitung ist wirklich beeindruckend.',
+    date: 'Februar 2026',
+  },
+  {
+    id: 'review-7',
     productId: 'latzhose',
     name: 'Werner P.',
     rating: 4.5,
     comment: 'Sehr praktisch mit den vielen Taschen. Stoff ist robust und langlebig.',
     date: 'Februar 2026',
+  },
+  {
+    id: 'review-8',
+    productId: 'latzhose',
+    name: 'Julia K.',
+    rating: 5,
+    comment: 'Überraschend komfortabel und funktional. Die Ausstattung ist sehr durchdacht.',
+    date: 'März 2026',
   },
 ] as const;
 

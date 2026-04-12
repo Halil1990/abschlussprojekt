@@ -2,39 +2,13 @@
 
 import WorkwearZone from "./WorkwearZone";
 import type { Asset, ZoneRectangle } from "../types";
-import { WORKWEAR_IMAGES, ZONE_DROP_PREFIX, CUSTOMER_REVIEWS } from "../constants";
+import { WORKWEAR_IMAGES, ZONE_DROP_PREFIX } from "../constants";
 import { getArtworkTransform } from "../utils";
 import {
   getWorkwearProductByIndex,
   getWorkwearProductShortLabel,
   getWorkwearSideLabel,
 } from "../productHelpers";
-
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <svg
-          key={i}
-          className="h-3.5 w-3.5"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-            fill={
-              i < Math.floor(rating)
-                ? '#F58220'
-                : i < rating
-                  ? 'rgba(245, 130, 32, 0.5)'
-                  : 'rgba(245, 130, 32, 0.3)'
-            }
-          />
-        </svg>
-      ))}
-    </div>
-  );
-}
 
 interface KonfiguratorPreviewProps {
   activeWorkwearIndex: number;
@@ -202,32 +176,6 @@ export function KonfiguratorPreview({
               );
             })}
           </div>
-        </div>
-
-        {/* Customer Review */}
-        <div className="rounded-xl border border-white/10 bg-black/25 p-3">
-          {(() => {
-            const reviews = CUSTOMER_REVIEWS.filter(
-              (r) => r.productId === activeProduct
-            );
-            const firstReview = reviews[0];
-
-            return firstReview ? (
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-semibold text-white/60">KUNDENBEWERTUNG</p>
-                  <p className="text-xs text-white/50">{firstReview.date}</p>
-                </div>
-                <div>
-                  <StarRating rating={firstReview.rating} />
-                </div>
-                <p className="text-sm font-medium text-white">{firstReview.name}</p>
-                <p className="text-xs text-white/70 leading-relaxed">
-                  &quot;{firstReview.comment}&quot;
-                </p>
-              </div>
-            ) : null;
-          })()}
         </div>
       </div>
     </section>
