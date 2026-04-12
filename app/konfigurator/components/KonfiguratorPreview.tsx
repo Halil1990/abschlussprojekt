@@ -2,13 +2,39 @@
 
 import WorkwearZone from "./WorkwearZone";
 import type { Asset, ZoneRectangle } from "../types";
-import { WORKWEAR_IMAGES, ZONE_DROP_PREFIX } from "../constants";
+import { WORKWEAR_IMAGES, ZONE_DROP_PREFIX, CUSTOMER_REVIEWS } from "../constants";
 import { getArtworkTransform } from "../utils";
 import {
   getWorkwearProductByIndex,
   getWorkwearProductShortLabel,
   getWorkwearSideLabel,
 } from "../productHelpers";
+
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <svg
+          key={i}
+          className="h-3.5 w-3.5"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+            fill={
+              i < Math.floor(rating)
+                ? '#F58220'
+                : i < rating
+                  ? 'rgba(245, 130, 32, 0.5)'
+                  : 'rgba(245, 130, 32, 0.3)'
+            }
+          />
+        </svg>
+      ))}
+    </div>
+  );
+}
 
 interface KonfiguratorPreviewProps {
   activeWorkwearIndex: number;
@@ -137,43 +163,71 @@ export function KonfiguratorPreview({
         </div>
       </div>
 
-      <div className="mt-5 flex justify-center">
-        <div
-          ref={thumbnailStripRef}
-          className="mx-auto flex w-fit max-w-full gap-2 overflow-x-auto rounded-xl border border-white/10 bg-black/25 p-2 pb-2"
-        >
-          {visibleProductImageIndexes.map((index) => {
-            const imageUrl = WORKWEAR_IMAGES[index];
+      <div className="mt-5 flex flex-col gap-5">
+        <div className="flex justify-center">
+          <div
+            ref={thumbnailStripRef}
+            className="mx-auto flex w-fit max-w-full gap-2 overflow-x-auto rounded-xl border border-white/10 bg-black/25 p-2 pb-2"
+          >
+            {visibleProductImageIndexes.map((index) => {
+              const imageUrl = WORKWEAR_IMAGES[index];
 
-            return (
-              <div key={index} className="shrink-0">
-                <button
-                  type="button"
-                  onClick={() => onSelectWorkwearImage(index)}
-                  className={`relative overflow-hidden rounded-lg border-2 transition ${
-                    activeWorkwearIndex === index
-                      ? "border-nordwerk-orange shadow-lg shadow-nordwerk-orange/40"
-                      : "border-white/20 hover:border-white/40"
-                  }`}
-                  style={{
-                    width: "62px",
-                    height: "92px",
-                    aspectRatio: "768 / 1366",
-                  }}
-                  aria-label={`${getWorkwearProductShortLabel(activeProduct)} ${getWorkwearSideLabel(imageUrl)}`}
-                >
-                  <img
-                    src={imageUrl}
-                    alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-                <p className="mt-1 text-center text-[11px] font-medium text-white/80">
-                  {getWorkwearSideLabel(imageUrl)}
+              return (
+                <div key={index} className="shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onSelectWorkwearImage(index)}
+                    className={`relative overflow-hidden rounded-lg border-2 transition ${
+                      activeWorkwearIndex === index
+                        ? "border-nordwerk-orange shadow-lg shadow-nordwerk-orange/40"
+                        : "border-white/20 hover:border-white/40"
+                    }`}
+                    style={{
+                      width: "62px",
+                      height: "92px",
+                      aspectRatio: "768 / 1366",
+                    }}
+                    aria-label={`${getWorkwearProductShortLabel(activeProduct)} ${getWorkwearSideLabel(imageUrl)}`}
+                  >
+                    <img
+                      src={imageUrl}
+                      alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                  <p className="mt-1 text-center text-[11px] font-medium text-white/80">
+                    {getWorkwearSideLabel(imageUrl)}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Customer Review */}
+        <div className="rounded-xl border border-white/10 bg-black/25 p-3">
+          {(() => {
+            const reviews = CUSTOMER_REVIEWS.filter(
+              (r) => r.productId === activeProduct
+            );
+            const firstReview = reviews[0];
+
+            return firstReview ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold text-white/60">KUNDENBEWERTUNG</p>
+                  <p className="text-xs text-white/50">{firstReview.date}</p>
+                </div>
+                <div>
+                  <StarRating rating={firstReview.rating} />
+                </div>
+                <p className="text-sm font-medium text-white">{firstReview.name}</p>
+                <p className="text-xs text-white/70 leading-relaxed">
+                  &quot;{firstReview.comment}&quot;
                 </p>
               </div>
-            );
-          })}
+            ) : null;
+          })()}
         </div>
       </div>
     </section>

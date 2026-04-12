@@ -77,6 +77,66 @@ export const WORKWEAR_PREVIEW_COLORS = [
 export type WorkwearPreviewColorId =
   (typeof WORKWEAR_PREVIEW_COLORS)[number]['id'];
 
+export type CustomerReview = {
+  id: string;
+  productId: WorkwearProductId;
+  name: string;
+  rating: number;
+  comment: string;
+  date: string;
+};
+
+export const CUSTOMER_REVIEWS: readonly CustomerReview[] = [
+  {
+    id: 'review-1',
+    productId: 'jacke',
+    name: 'Klaus M.',
+    rating: 5,
+    comment: 'Hervorragende Verarbeitung! Sehr robust und komfortabel auch nach langer Tragezeit.',
+    date: 'März 2026',
+  },
+  {
+    id: 'review-2',
+    productId: 'jacke',
+    name: 'Anna S.',
+    rating: 4.5,
+    comment: 'Tolle Qualität. Die Taschen sind praktisch und die Farbe hält sehr gut.',
+    date: 'Februar 2026',
+  },
+  {
+    id: 'review-3',
+    productId: 'hose',
+    name: 'Marco D.',
+    rating: 5,
+    comment: 'Perfekt für den Alltag. Super bequem und die Bedruckung bleibt erhalten.',
+    date: 'Januar 2026',
+  },
+  {
+    id: 'review-4',
+    productId: 'hose',
+    name: 'Linda K.',
+    rating: 4,
+    comment: 'Gutes Preis-Leistungs-Verhältnis. Hält lange und sieht immer noch gut aus.',
+    date: 'Dezember 2025',
+  },
+  {
+    id: 'review-5',
+    productId: 'weste',
+    name: 'Thomas B.',
+    rating: 5,
+    comment: 'Absolut empfehlenswert! Die Veredelung ist hochwertig und haltbar.',
+    date: 'März 2026',
+  },
+  {
+    id: 'review-6',
+    productId: 'latzhose',
+    name: 'Werner P.',
+    rating: 4.5,
+    comment: 'Sehr praktisch mit den vielen Taschen. Stoff ist robust und langlebig.',
+    date: 'Februar 2026',
+  },
+] as const;
+
 const buildImageSequence = (folder: string, imageExtension: string) =>
   WORKWEAR_VIEW_FILENAMES.map((fileName) => {
     const viewName = fileName.replace(/\.[^.]+$/, '');

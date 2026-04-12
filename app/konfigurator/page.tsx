@@ -24,6 +24,7 @@ import Footer from "../../components/layout/Footer";
 import ProductSelectionSection from "./components/ProductSelectionSection";
 import UploadModal from "./components/UploadModal";
 import { TutorialModal } from "./components/TutorialModal";
+import { KonfiguratorPartners } from "./components/KonfiguratorPartners";
 import {
   DEFAULT_WORKWEAR_INDEX,
   getMaxZonesForImage,
@@ -317,7 +318,7 @@ export default function Konfigurator() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed px-4 pb-16 pt-36 sm:px-6 sm:pt-44">
+      <main className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed px-4 pb-16 pt-8 sm:px-6 sm:pt-10">
         <div className="mx-auto max-w-7xl">
           <h1 className="text-center text-3xl text-black sm:text-4xl">
             Die Konfiguration dient als Grundlage für deine Anfrage.
@@ -361,7 +362,7 @@ export default function Konfigurator() {
                 </div>
               ) : null}
 
-              <div className="mt-4 grid gap-6 2xl:grid-cols-[360px_minmax(0,1fr)]">
+              <div className="mt-4 grid gap-6 2xl:grid-cols-[360px_minmax(0,1fr)_280px]">
                 <div className="hidden 2xl:block">
                   <KonfiguratorSidebar
                     {...sidebarProps}
@@ -390,6 +391,10 @@ export default function Konfigurator() {
                     onRotateZone={rotateZoneById}
                     onOpenTools={() => setIsSidebarOpen(true)}
                   />
+                </div>
+
+                <div className="hidden 2xl:block">
+                  <KonfiguratorPartners />
                 </div>
               </div>
 
