@@ -1,13 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { type PointerEvent as ReactPointerEvent } from "react";
 import WorkwearZone from "./WorkwearZone";
-import type { Asset, ZoneRect, ZoneDragState } from "../types";
-import {
-  WORKWEAR_IMAGES,
-  ZONE_DROP_PREFIX,
-  getForbiddenZonesForImage,
-} from "../constants";
+import type { Asset, ZoneRectangle } from "../types";
+import { WORKWEAR_IMAGES, ZONE_DROP_PREFIX } from "../constants";
 import { getArtworkTransform } from "../utils";
 import {
   getWorkwearProductByIndex,
@@ -17,30 +12,19 @@ import {
 
 interface KonfiguratorPreviewProps {
   activeWorkwearIndex: number;
-  zones: ZoneRect[];
-  selectedZone: ZoneRect | null;
+  zones: ZoneRectangle[];
+  selectedZone: ZoneRectangle | null;
   assetMap: Map<string, Asset>;
   previewOnly: boolean;
   isOverPreview: boolean;
   visibleProductImageIndexes: number[];
-  zoneDrag: ZoneDragState | null;
   previewFrameRef: React.RefObject<HTMLDivElement | null>;
   thumbnailStripRef: React.RefObject<HTMLDivElement | null>;
-  onThumbnailStripScroll?: () => void;
   onSelectZone: (zoneId: string) => void;
   onSelectWorkwearImage: (index: number) => void;
-  onZoneDragStart: (event: ReactPointerEvent<HTMLDivElement>, zoneId: string) => void;
-  onZoneDragMove: (event: ReactPointerEvent<HTMLDivElement>) => void;
-  onZoneDragEnd: (event: ReactPointerEvent<HTMLDivElement>) => void;
-  onZoneResizeStart: (
-    event: ReactPointerEvent<HTMLDivElement>,
-    zoneId: string,
-    corner: "tl" | "tr" | "bl" | "br"
-  ) => void;
-  onZoneResizeMove: (event: ReactPointerEvent<HTMLDivElement>) => void;
-  onZoneResizeEnd: (event: ReactPointerEvent<HTMLDivElement>) => void;
   onClearZone: (zoneId: string) => void;
   onRotateZone: (zoneId: string, degrees: number) => void;
+  onOpenTools: () => void;
 }
 
 export function KonfiguratorPreview({
@@ -51,31 +35,40 @@ export function KonfiguratorPreview({
   previewOnly,
   isOverPreview,
   visibleProductImageIndexes,
-  zoneDrag,
   previewFrameRef,
   thumbnailStripRef,
   onSelectZone,
   onSelectWorkwearImage,
-  onZoneDragStart,
-  onZoneDragMove,
-  onZoneDragEnd,
-  onZoneResizeStart,
-  onZoneResizeMove,
-  onZoneResizeEnd,
   onClearZone,
   onRotateZone,
+  onOpenTools,
 }: KonfiguratorPreviewProps) {
   const activeProduct = getWorkwearProductByIndex(activeWorkwearIndex);
   const activeWorkwearImage = WORKWEAR_IMAGES[activeWorkwearIndex];
+  // const activeSideLabel = getWorkwearSideLabel(activeWorkwearImage);
 
   return (
-    <section className="rounded-3xl border border-white/15 bg-black/45 p-4 sm:p-6">
-      <div className="mt-5 rounded-4xl border border-white/10 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),rgba(0,0,0,0.18)_48%,rgba(0,0,0,0.4)_100%)] p-4 sm:p-8">
+    <section className="mx-auto w-full max-w-240 rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
+      <div className="relative flex items-center justify-center">
+        <button
+          type="button"
+          onClick={onOpenTools}
+          className="absolute left-0 rounded-xl border border-white/25 bg-black/45 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-black/60 2xl:hidden"
+        >
+          Werkzeuge
+        </button>
+        <h2 className="text-lg font-semibold text-white">Vorschau</h2>
+      </div>
+      {/* <p className="mt-1 pt-5 text-sm text-white/80">
+        {getWorkwearProductShortLabel(activeProduct)} - {activeSideLabel}
+      </p> */}
+
+      <div className="mt-4 mx-auto w-full max-w-180 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <div className="mx-auto max-w-155">
-          <div className="relative">
+          <div className="relative py-3 sm:py-4">
             <div
               ref={previewFrameRef}
-              className="relative mx-auto w-full overflow-hidden"
+              className="relative mx-auto w-full overflow-hidden rounded-[1.4rem] border border-white/10 bg-black/25 shadow-[0_14px_34px_rgba(0,0,0,0.35)]"
               style={{ aspectRatio: "768 / 1320" }}
             >
               <div
@@ -85,7 +78,7 @@ export function KonfiguratorPreview({
                 <img
                   src={activeWorkwearImage}
                   alt={`Workwear ${getWorkwearProductShortLabel(activeProduct)}`}
-                  className="pointer-events-none select-none object-contain absolute inset-0 h-full w-full"
+                  className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
                 />
 
                 {previewOnly
@@ -133,78 +126,54 @@ export function KonfiguratorPreview({
                         }
                         zoneDropPrefix={ZONE_DROP_PREFIX}
                         onSelect={onSelectZone}
-                        onZoneDragStart={onZoneDragStart}
-                        onZoneDragMove={onZoneDragMove}
-                        onZoneDragEnd={onZoneDragEnd}
-                        onZoneResizeStart={onZoneResizeStart}
-                        onZoneResizeMove={onZoneResizeMove}
-                        onZoneResizeEnd={onZoneResizeEnd}
                         onClearAsset={onClearZone}
                         onRotate={(degrees) => onRotateZone(zone.id, degrees)}
                       />
                     ))}
 
-                {/* Forbidden Zones - nur beim Bewegen */}
-                {zoneDrag &&
-                  getForbiddenZonesForImage(activeWorkwearIndex).map(
-                    (forbiddenZone, index) => (
-                      <div
-                        key={`forbidden-${index}`}
-                        style={{
-                          left: forbiddenZone.x + "%",
-                          top: forbiddenZone.y + "%",
-                          width: forbiddenZone.w + "%",
-                          height: forbiddenZone.h + "%",
-                        }}
-                        className="absolute bg-red-500/30 border-2 border-red-500 pointer-events-none"
-                        title="Antizone - Gesperrter Bereich"
-                      />
-                    )
-                  )}
-              </div>
-            </div>
-
-            {/* Thumbnail Gallery */}
-            <div className="flex justify-center">
-              <div
-                ref={thumbnailStripRef}
-                className="flex w-fit gap-2 overflow-x-auto pb-2"
-              >
-                {visibleProductImageIndexes.map((index) => {
-                  const imageUrl = WORKWEAR_IMAGES[index];
-
-                  return (
-                    <div key={index} className="shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => onSelectWorkwearImage(index)}
-                        className={`relative overflow-hidden border-2 transition ${
-                          activeWorkwearIndex === index
-                            ? "border-nordwerk-orange shadow-lg shadow-nordwerk-orange/40"
-                            : "border-white/20 hover:border-white/40"
-                        }`}
-                        style={{
-                          width: "62px",
-                          height: "92px",
-                          aspectRatio: "768 / 1366",
-                        }}
-                        aria-label={`${getWorkwearProductShortLabel(activeProduct)} ${getWorkwearSideLabel(imageUrl)}`}
-                      >
-                        <img
-                          src={imageUrl}
-                          alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
-                          className="h-full w-full object-cover"
-                        />
-                      </button>
-                      <p className="mt-1 text-center text-[11px] font-medium text-white/80">
-                        {getWorkwearSideLabel(imageUrl)}
-                      </p>
-                    </div>
-                  );
-                })}
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="mt-5 flex justify-center">
+        <div
+          ref={thumbnailStripRef}
+          className="mx-auto flex w-fit max-w-full gap-2 overflow-x-auto rounded-xl border border-white/10 bg-black/25 p-2 pb-2"
+        >
+          {visibleProductImageIndexes.map((index) => {
+            const imageUrl = WORKWEAR_IMAGES[index];
+
+            return (
+              <div key={index} className="shrink-0">
+                <button
+                  type="button"
+                  onClick={() => onSelectWorkwearImage(index)}
+                  className={`relative overflow-hidden rounded-lg border-2 transition ${
+                    activeWorkwearIndex === index
+                      ? "border-nordwerk-orange shadow-lg shadow-nordwerk-orange/40"
+                      : "border-white/20 hover:border-white/40"
+                  }`}
+                  style={{
+                    width: "62px",
+                    height: "92px",
+                    aspectRatio: "768 / 1366",
+                  }}
+                  aria-label={`${getWorkwearProductShortLabel(activeProduct)} ${getWorkwearSideLabel(imageUrl)}`}
+                >
+                  <img
+                    src={imageUrl}
+                    alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
+                    className="h-full w-full object-cover"
+                  />
+                </button>
+                <p className="mt-1 text-center text-[11px] font-medium text-white/80">
+                  {getWorkwearSideLabel(imageUrl)}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

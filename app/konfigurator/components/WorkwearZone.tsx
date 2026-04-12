@@ -1,24 +1,21 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useDroppable } from '@dnd-kit/core';
-import type { PointerEvent as ReactPointerEvent } from 'react';
 import { Trash2, RotateCcw, RotateCw } from 'lucide-react';
 
-import type { Asset, ZoneRect } from '../types';
+import type { Asset, ZoneRectangle } from '../types';
+
+function getCompactZoneLabel(label: string) {
+  return label.replace(/^zone\s*/i, '').trim();
+}
 
 type WorkwearZoneProps = {
-  zone: ZoneRect;
+  zone: ZoneRectangle;
   asset: Asset | undefined;
   isSelected: boolean;
   previewIsOver: boolean;
   zoneDropPrefix: string;
   onSelect: (zoneId: string) => void;
-  onZoneDragStart: (event: ReactPointerEvent<HTMLDivElement>, zoneId: string) => void;
-  onZoneDragMove: (event: ReactPointerEvent<HTMLDivElement>) => void;
-  onZoneDragEnd: (event: ReactPointerEvent<HTMLDivElement>) => void;
-  onZoneResizeStart: (event: ReactPointerEvent<HTMLDivElement>, zoneId: string, corner: 'tl' | 'tr' | 'bl' | 'br') => void;
-  onZoneResizeMove: (event: ReactPointerEvent<HTMLDivElement>) => void;
-  onZoneResizeEnd: (event: ReactPointerEvent<HTMLDivElement>) => void;
   onClearAsset: (zoneId: string) => void;
   onRotate: (degrees: number) => void;
 };
@@ -30,12 +27,6 @@ export default function WorkwearZone({
   previewIsOver,
   zoneDropPrefix,
   onSelect,
-  onZoneDragStart,
-  onZoneDragMove,
-  onZoneDragEnd,
-  onZoneResizeStart,
-  onZoneResizeMove,
-  onZoneResizeEnd,
   onClearAsset,
   onRotate,
 }: WorkwearZoneProps) {
@@ -47,10 +38,6 @@ export default function WorkwearZone({
         setNodeRef(node);
       }}
       onClick={() => onSelect(zone.id)}
-      onPointerDown={(event) => onZoneDragStart(event, zone.id)}
-      onPointerMove={onZoneDragMove}
-      onPointerUp={onZoneDragEnd}
-      onPointerCancel={onZoneDragEnd}
       style={{
         left: zone.x + '%',
         top: zone.y + '%',
@@ -111,7 +98,7 @@ export default function WorkwearZone({
       {!asset ? (
         <div className="absolute inset-0 flex items-center justify-center px-1 text-center">
           <span className="rounded bg-black/75 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-white sm:text-[11px]">
-            {zone.label}
+            {getCompactZoneLabel(zone.label)}
           </span>
         </div>
       ) : (
@@ -128,59 +115,6 @@ export default function WorkwearZone({
         </div>
       )}
       </div>
-
-      {isSelected && (
-        <>
-          {/* Top-left corner */}
-          <div
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              onZoneResizeStart(e, zone.id, 'tl');
-            }}
-            onPointerMove={onZoneResizeMove}
-            onPointerUp={onZoneResizeEnd}
-            onPointerCancel={onZoneResizeEnd}
-            className="absolute -left-1.5 -top-1.5 h-3 w-3 cursor-nwse-resize rounded-full bg-white hover:bg-white/80"
-            style={{ pointerEvents: 'auto' }}
-          />
-          {/* Top-right corner */}
-          <div
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              onZoneResizeStart(e, zone.id, 'tr');
-            }}
-            onPointerMove={onZoneResizeMove}
-            onPointerUp={onZoneResizeEnd}
-            onPointerCancel={onZoneResizeEnd}
-            className="absolute -right-1.5 -top-1.5 h-3 w-3 cursor-nesw-resize rounded-full bg-white hover:bg-white/80"
-            style={{ pointerEvents: 'auto' }}
-          />
-          {/* Bottom-left corner */}
-          <div
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              onZoneResizeStart(e, zone.id, 'bl');
-            }}
-            onPointerMove={onZoneResizeMove}
-            onPointerUp={onZoneResizeEnd}
-            onPointerCancel={onZoneResizeEnd}
-            className="absolute -bottom-1.5 -left-1.5 h-3 w-3 cursor-nesw-resize rounded-full bg-white hover:bg-white/80"
-            style={{ pointerEvents: 'auto' }}
-          />
-          {/* Bottom-right corner */}
-          <div
-            onPointerDown={(e) => {
-              e.stopPropagation();
-              onZoneResizeStart(e, zone.id, 'br');
-            }}
-            onPointerMove={onZoneResizeMove}
-            onPointerUp={onZoneResizeEnd}
-            onPointerCancel={onZoneResizeEnd}
-            className="absolute -bottom-1.5 -right-1.5 h-3 w-3 cursor-nwse-resize rounded-full bg-white hover:bg-white/80"
-            style={{ pointerEvents: 'auto' }}
-          />
-        </>
-      )}
     </div>
   );
 }

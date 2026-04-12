@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+
 "use client";
 
 import {
@@ -5,10 +7,11 @@ import {
   useMemo,
   useRef,
   useState,
-  type PointerEvent as ReactPointerEvent,
 } from "react";
 import {
   DndContext,
+  DragOverlay,
+  type DragStartEvent,
   type DragEndEvent,
   PointerSensor,
   useDroppable,
@@ -53,19 +56,11 @@ export default function Konfigurator() {
     selectedZoneId,
     setSelectedZoneId,
     selectedZone,
-    zoneDrag,
     zoneCounterRef,
     previewFrameRef,
-    updateZoneSize,
     rotateArtwork,
     rotateZoneById,
     clearZone,
-    handleZoneDragStart,
-    handleZoneDragMove,
-    handleZoneDragEnd,
-    handleZoneResizeStart,
-    handleZoneResizeMove,
-    handleZoneResizeEnd,
   } = useZoneState(
     initialWorkwearZoneState.zones,
     initialWorkwearZoneState.selectedZoneId,
@@ -75,7 +70,6 @@ export default function Konfigurator() {
   const {
     assets,
     assetMap,
-    urlsRef,
     handleFiles,
     removeAsset,
     cleanupAssets,
@@ -101,6 +95,8 @@ export default function Konfigurator() {
   const [draftPreparationSuccess, setDraftPreparationSuccess] = useState("");
   const [availableImageIndexes, setAvailableImageIndexes] = useState<Set<number> | null>(null);
   const [printMaterial, setPrintMaterial] = useState<PrintMaterial>("druck");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeDragAssetId, setActiveDragAssetId] = useState<string | null>(null);
   const thumbnailStripRef = useRef<HTMLDivElement | null>(null);
 
   // Persistence Hook
@@ -114,7 +110,6 @@ export default function Konfigurator() {
     activeWorkwearIndex,
     setZones,
     setSelectedZoneId,
-    setActiveWorkwearIndex,
     setAvailableImageIndexes,
     zoneCounterRef,
     workwearStateRef,
@@ -145,11 +140,6 @@ export default function Konfigurator() {
 
   const maxZonesForCurrentImage = getMaxZonesForImage(activeWorkwearIndex);
 
-  // Handle custom zone drag move with forbidden zones validation
-  const handleZoneDragMoveWithValidation = (event: ReactPointerEvent<HTMLDivElement>) => {
-    handleZoneDragMove(event, activeWorkwearIndex);
-  };
-
   // Assign asset to zone with proper callbacks
   const assignAssetToSelectedZone = (assetId: string) => {
     if (!selectedZone) return;
@@ -164,10 +154,23 @@ export default function Konfigurator() {
 
   // Drag end handler with proper zone assignment
   const handleDragEndWithAssignment = (event: DragEndEvent) => {
+    setActiveDragAssetId(null);
     handleDragEnd(event, zones, selectedZone, (zoneId: string, assetId: string) => {
       assignAssetToZoneUtil(zoneId, assetId, zones, setZones, setSelectedZoneId);
     });
   };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const activeId = String(event.active.id);
+    if (!activeId.startsWith("asset:")) {
+      setActiveDragAssetId(null);
+      return;
+    }
+
+    setActiveDragAssetId(activeId.slice("asset:".length));
+  };
+
+  const activeDragAsset = activeDragAssetId ? assetMap.get(activeDragAssetId) : undefined;
 
   // Cleanup on unmount
   useEffect(() => {
@@ -180,16 +183,6 @@ export default function Konfigurator() {
   useEffect(() => {
     thumbnailStripRef.current?.scrollTo({ left: 0 });
   }, [activeProduct]);
-
-  // Revoke blob URLs on cleanup
-  useEffect(() => {
-    const urls = urlsRef.current;
-    return () => {
-      for (const url of urls) {
-        URL.revokeObjectURL(url);
-      }
-    };
-  }, [urlsRef]);
 
   // Handle switch to unavailable image
   useEffect(() => {
@@ -293,6 +286,34 @@ export default function Konfigurator() {
     }
   };
 
+  const sidebarProps: React.ComponentProps<typeof KonfiguratorSidebar> = {
+    assets,
+    zones,
+    selectedZone,
+    selectedAsset: selectedZone?.assetId ? assetMap.get(selectedZone.assetId) : undefined,
+    maxZonesForCurrentImage,
+    previewOnly,
+    isPreparingDraft,
+    draftPreparationError,
+    draftPreparationSuccess,
+    printMaterial,
+    onAssetAssign: assignAssetToSelectedZone,
+    onAssetRemove: removeAssetWithChainCleanup,
+    onUploadModalOpen: () => setIsUploadModalOpen(true),
+    onTutorialOpen: () => setIsTutorialOpen(true),
+    onPreviewOnlyToggle: () => setPreviewOnly((prev) => !prev),
+    onRotateLeft: () => rotateArtwork(-5),
+    onRotateRight: () => rotateArtwork(5),
+    onClearZone: clearZone,
+    onPrintMaterialChange: setPrintMaterial,
+    onPrepareDraft: prepareDraftAndOpenMainForm,
+    onBackToSelection: () => {
+      saveCurrentWorkwearState(activeWorkwearIndex);
+      setHasStartedConfigurator(false);
+      setIsSidebarOpen(false);
+    },
+  };
+
   return (
     <>
       <Navbar />
@@ -308,44 +329,45 @@ export default function Konfigurator() {
               onStartConfigurator={startConfiguratorForProduct}
             />
           ) : (
-            <DndContext sensors={sensors} onDragEnd={handleDragEndWithAssignment}>
-              <div className="mt-8 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
-                <KonfiguratorSidebar
-                  assets={assets}
-                  zones={zones}
-                  selectedZone={selectedZone}
-                  selectedAsset={
-                    selectedZone?.assetId ? assetMap.get(selectedZone.assetId) : undefined
-                  }
-                  maxZonesForCurrentImage={maxZonesForCurrentImage}
-                  previewOnly={previewOnly}
-                  isPreparingDraft={isPreparingDraft}
-                  draftPreparationError={draftPreparationError}
-                  draftPreparationSuccess={draftPreparationSuccess}
-                  printMaterial={printMaterial}
-                  onSelectedZoneChange={setSelectedZoneId}
-                  onAssetAssign={assignAssetToSelectedZone}
-                  onAssetRemove={removeAssetWithChainCleanup}
-                  onUploadModalOpen={() => setIsUploadModalOpen(true)}
-                  onTutorialOpen={() => setIsTutorialOpen(true)}
-                  onPreviewOnlyToggle={() => setPreviewOnly((prev) => !prev)}
-                  onRotateLeft={() => rotateArtwork(-5)}
-                  onRotateRight={() => rotateArtwork(5)}
-                  onZoneSizeDecrease={() =>
-                    updateZoneSize((selectedZone?.w ?? 11.3) - 1)
-                  }
-                  onZoneSizeincrease={() =>
-                    updateZoneSize((selectedZone?.w ?? 11.3) + 1)
-                  }
-                  onZoneSizeChange={updateZoneSize}
-                  onClearZone={clearZone}
-                  onPrintMaterialChange={setPrintMaterial}
-                  onPrepareDraft={prepareDraftAndOpenMainForm}
-                  onBackToSelection={() => {
-                    saveCurrentWorkwearState(activeWorkwearIndex);
-                    setHasStartedConfigurator(false);
-                  }}
-                />
+            <DndContext
+              sensors={sensors}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEndWithAssignment}
+              onDragCancel={() => setActiveDragAssetId(null)}
+            >
+              {isSidebarOpen ? (
+                <div className="fixed inset-0 z-50 2xl:hidden" role="dialog" aria-modal="true">
+                  <button
+                    type="button"
+                    aria-label="Sidebar schliessen"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
+                  />
+                  <div className="absolute right-0 top-0 h-full w-full max-w-105 overflow-y-auto p-3 sm:p-4">
+                    <div className="mb-3 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setIsSidebarOpen(false)}
+                        className="rounded-lg border border-white/25 bg-black/40 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-white"
+                      >
+                        Schliessen
+                      </button>
+                    </div>
+                    <KonfiguratorSidebar
+                      {...sidebarProps}
+                      printMaterialInputName="printMaterial-mobile"
+                    />
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="mt-4 grid gap-6 2xl:grid-cols-[360px_minmax(0,1fr)]">
+                <div className="hidden 2xl:block">
+                  <KonfiguratorSidebar
+                    {...sidebarProps}
+                    printMaterialInputName="printMaterial-desktop"
+                  />
+                </div>
 
                 <div
                   ref={(node) => {
@@ -360,22 +382,31 @@ export default function Konfigurator() {
                     previewOnly={previewOnly}
                     isOverPreview={isOverPreview}
                     visibleProductImageIndexes={visibleProductImageIndexes}
-                    zoneDrag={zoneDrag}
                     previewFrameRef={previewFrameRef}
                     thumbnailStripRef={thumbnailStripRef}
                     onSelectZone={setSelectedZoneId}
                     onSelectWorkwearImage={selectWorkwearImage}
-                    onZoneDragStart={handleZoneDragStart}
-                    onZoneDragMove={handleZoneDragMoveWithValidation}
-                    onZoneDragEnd={handleZoneDragEnd}
-                    onZoneResizeStart={handleZoneResizeStart}
-                    onZoneResizeMove={handleZoneResizeMove}
-                    onZoneResizeEnd={handleZoneResizeEnd}
                     onClearZone={clearZone}
                     onRotateZone={rotateZoneById}
+                    onOpenTools={() => setIsSidebarOpen(true)}
                   />
                 </div>
               </div>
+
+              <DragOverlay>
+                {activeDragAsset ? (
+                  <div className="pointer-events-none flex items-center gap-2 rounded-lg border border-white/25 bg-black/80 px-2.5 py-2 shadow-xl">
+                    <img
+                      src={activeDragAsset.src}
+                      alt={activeDragAsset.name}
+                      className="h-10 w-10 rounded border border-white/25 object-cover"
+                    />
+                    <span className="max-w-45 truncate text-xs font-medium text-white/90">
+                      {activeDragAsset.name}
+                    </span>
+                  </div>
+                ) : null}
+              </DragOverlay>
             </DndContext>
           )}
         </div>

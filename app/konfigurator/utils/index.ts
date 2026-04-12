@@ -1,2 +1,2 @@
-export { clamp, clampZoneWidth, createZone } from "./zoneCalculations";
+export { clamp, createZone } from "./zoneCalculations";
 export { getArtworkTransform } from "./transformations";

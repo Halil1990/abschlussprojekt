@@ -1,21 +1,20 @@
 "use client";
 
-import type { Asset, ZoneRect, PrintMaterial } from "../types";
+import type { Asset, ZoneRectangle, PrintMaterial } from "../types";
 import DraggableAssetCard from "./DraggableAssetCard";
-import { INITIAL_ZONE_RECT } from "../constants";
 
 interface KonfiguratorSidebarProps {
   assets: Asset[];
-  zones: ZoneRect[];
-  selectedZone: ZoneRect | null;
+  zones: ZoneRectangle[];
+  selectedZone: ZoneRectangle | null;
   selectedAsset: Asset | undefined;
   maxZonesForCurrentImage: number;
+  printMaterialInputName?: string;
   previewOnly: boolean;
   isPreparingDraft: boolean;
   draftPreparationError: string;
   draftPreparationSuccess: string;
   printMaterial: PrintMaterial;
-  onSelectedZoneChange: (zoneId: string) => void;
   onAssetAssign: (assetId: string) => void;
   onAssetRemove: (assetId: string) => void;
   onUploadModalOpen: () => void;
@@ -23,9 +22,6 @@ interface KonfiguratorSidebarProps {
   onPreviewOnlyToggle: () => void;
   onRotateLeft: () => void;
   onRotateRight: () => void;
-  onZoneSizeDecrease: () => void;
-  onZoneSizeincrease: () => void;
-  onZoneSizeChange: (width: number) => void;
   onClearZone: (zoneId: string) => void;
   onPrintMaterialChange: (material: PrintMaterial) => void;
   onPrepareDraft: () => void;
@@ -34,16 +30,13 @@ interface KonfiguratorSidebarProps {
 
 export function KonfiguratorSidebar({
   assets,
-  zones,
-  selectedZone,
   selectedAsset,
-  maxZonesForCurrentImage,
+  printMaterialInputName = "printMaterial",
   previewOnly,
   isPreparingDraft,
   draftPreparationError,
   draftPreparationSuccess,
   printMaterial,
-  onSelectedZoneChange,
   onAssetAssign,
   onAssetRemove,
   onUploadModalOpen,
@@ -51,18 +44,16 @@ export function KonfiguratorSidebar({
   onPreviewOnlyToggle,
   onRotateLeft,
   onRotateRight,
-  onZoneSizeDecrease,
-  onZoneSizeincrease,
-  onZoneSizeChange,
-  onClearZone,
   onPrintMaterialChange,
   onPrepareDraft,
   onBackToSelection,
 }: KonfiguratorSidebarProps) {
   return (
-    <aside className="rounded-3xl border border-white/15 bg-black/45 p-4 sm:p-5">
+    <aside className="rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold text-white">Assets</h2>
+        <h2 className="text-lg font-semibold text-white">
+          So funktioniert’s:{" "}
+        </h2>
         <button
           type="button"
           onClick={onTutorialOpen}
@@ -72,24 +63,21 @@ export function KonfiguratorSidebar({
           💡
         </button>
       </div>
-      <p className="mt-1 text-sm text-white/80">
-        Logo per Drag and Drop oder Klick einer Zone zuweisen.
-      </p>
-      <p className="mt-1 text-xs text-white/70">
-        Zonen pro Bild: {zones.length} / {maxZonesForCurrentImage}
+      <p className="mt-1 pt-5 text-sm text-white/80">
+        Logo per Drag and Drop oder Klick einer festen Zone zuweisen.
       </p>
 
       <button
         type="button"
         onClick={onUploadModalOpen}
-        className="mt-4 w-full rounded-md bg-nordwerk-orange px-4 py-2 text-sm font-semibold text-black transition hover:opacity-90"
+        className="mt-4 w-full rounded-xl bg-nordwerk-orange px-4 py-2.5 text-sm font-semibold text-black transition hover:opacity-90"
       >
         + Bilder hochladen
       </button>
 
-      <div className="mt-4 max-h-105 space-y-3 overflow-auto pr-1">
+      <div className="mt-4 max-h-96 space-y-3 overflow-y-auto overflow-x-hidden pr-1">
         {assets.length === 0 ? (
-          <div className="rounded-lg border border-white/15 bg-black/30 p-4 text-sm text-white/80">
+          <div className="rounded-xl border border-white/15 bg-black/30 p-4 text-sm text-white/80">
             Noch keine Bilder hochgeladen.
           </div>
         ) : (
@@ -104,34 +92,41 @@ export function KonfiguratorSidebar({
         )}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {zones.map((zone) => (
-          <button
-            key={zone.id}
-            type="button"
-            onClick={() => onSelectedZoneChange(zone.id)}
-            className={`rounded-full px-3 py-2 text-xs transition ${
-              selectedZone?.id === zone.id
-                ? "bg-nordwerk-orange text-black"
-                : "bg-white/10 text-white hover:bg-white/15"
-            }`}
-          >
-            {zone.label}
-          </button>
-        ))}
-      </div>
-
       {/* Aktive Zone Controls */}
-      <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4">
+      <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
           Aktive Zone
         </p>
-        <div className="mt-3 flex items-center justify-between gap-3">
-          <div>
-            <p className="text-base font-semibold text-white">
-              {selectedZone ? selectedZone.label : "-"}
-            </p>
-          </div>
+
+        <div className="mt-4 flex items-center gap-2">
+          <button
+            type="button"
+            className="flex-1 rounded-lg bg-white/10 py-2 text-xs font-medium text-white transition hover:bg-white/20 disabled:opacity-40"
+            onClick={onRotateLeft}
+            disabled={!selectedAsset}
+          >
+            ↺ Links
+          </button>
+          <button
+            type="button"
+            className="flex-1 rounded-lg bg-white/10 py-2 text-xs font-medium text-white transition hover:bg-white/20 disabled:opacity-40"
+            onClick={onRotateRight}
+            disabled={!selectedAsset}
+          >
+            ↻ Rechts
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={onPreviewOnlyToggle}
+          className="mt-4 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-white/15"
+        >
+          {previewOnly ? "Bearbeitung anzeigen" : "Nur Bild anzeigen"}
+        </button>
+
+        {/* bild entfernen button zeile 138-152 */}
+        {/* <div className="mt-3 flex items-center justify-center gap-3">
           {selectedAsset ? (
             <button
               type="button"
@@ -140,72 +135,16 @@ export function KonfiguratorSidebar({
                   onClearZone(selectedZone.id);
                 }
               }}
-              className="rounded-md border border-red-300/35 px-3 py-2 text-xs font-medium text-red-200 transition hover:border-red-200/60 hover:text-white"
+              className="rounded-lg border border-red-300/35 px-3 py-2 text-xs font-medium text-red-200 transition hover:border-red-200/60 hover:text-white"
             >
               Bild Entfernen
             </button>
           ) : null}
-        </div>
-
-        <div className="mt-4 flex items-center gap-2">
-          <button
-            type="button"
-            className="flex-1 rounded-md bg-white/10 py-2 text-xs font-medium text-white transition hover:bg-white/20 disabled:opacity-40"
-            onClick={onRotateLeft}
-            disabled={!selectedAsset}
-          >
-            ↺ Links
-          </button>
-          <button
-            type="button"
-            className="flex-1 rounded-md bg-white/10 py-2 text-xs font-medium text-white transition hover:bg-white/20 disabled:opacity-40"
-            onClick={onRotateRight}
-            disabled={!selectedAsset}
-          >
-            ↻ Rechts
-          </button>
-        </div>
-
-        <div className="mt-4 flex items-center gap-2">
-          <button
-            type="button"
-            className="h-9 w-9 rounded-md bg-white/10 text-white disabled:opacity-40"
-            onClick={onZoneSizeDecrease}
-            disabled={!selectedZone}
-          >
-            -
-          </button>
-          <input
-            type="range"
-            min={7.5}
-            max={15}
-            step={0.5}
-            value={selectedZone?.w ?? INITIAL_ZONE_RECT.w}
-            onChange={(event) => onZoneSizeChange(Number(event.target.value))}
-            disabled={!selectedZone}
-            className="w-full accent-orange-400 disabled:opacity-40"
-          />
-          <button
-            type="button"
-            className="h-9 w-9 rounded-md bg-white/10 text-white disabled:opacity-40"
-            onClick={onZoneSizeincrease}
-            disabled={!selectedZone}
-          >
-            +
-          </button>
-        </div>
-
-        <button
-          type="button"
-          onClick={onPreviewOnlyToggle}
-          className="mt-4 w-full rounded-md border border-white/25 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-white/15"
-        >
-          {previewOnly ? "Bearbeitung anzeigen" : "Nur Bild anzeigen"}
-        </button>
+        </div> */}
       </div>
 
       {/* Druckmaterial */}
-      <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4">
+      <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
           Druckmaterial
         </p>
@@ -213,10 +152,12 @@ export function KonfiguratorSidebar({
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
-              name="printMaterial"
+              name={printMaterialInputName}
               value="druck"
               checked={printMaterial === "druck"}
-              onChange={(e) => onPrintMaterialChange(e.target.value as PrintMaterial)}
+              onChange={(e) =>
+                onPrintMaterialChange(e.target.value as PrintMaterial)
+              }
               className="cursor-pointer"
             />
             <span className="text-sm text-white/85">Druck</span>
@@ -224,10 +165,12 @@ export function KonfiguratorSidebar({
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
-              name="printMaterial"
-              value="strick"
-              checked={printMaterial === "strick"}
-              onChange={(e) => onPrintMaterialChange(e.target.value as PrintMaterial)}
+              name={printMaterialInputName}
+              value="stick"
+              checked={printMaterial === "stick"}
+              onChange={(e) =>
+                onPrintMaterialChange(e.target.value as PrintMaterial)
+              }
               className="cursor-pointer"
             />
             <span className="text-sm text-white/85">Stick</span>
@@ -235,10 +178,14 @@ export function KonfiguratorSidebar({
         </div>
       </div>
 
+      <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+              <p className="font-bold uppercase underline tracking-[0.18em] text-white/70">Bitte geben Sie bei Ihrer Anfrage unbedingt die gewünschte Anzahl sowie die Größen der Kleidungsstücke an, damit wir Ihre Anfrage schnell und korrekt bearbeiten können</p>
+      </div>
+
       {/* Anfrage Form */}
-      <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4">
+      <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
-          Anfrage ueber Hauptformular
+          Anfrage über Hauptformular
         </p>
         <p className="mt-2 text-xs text-white/80">
           Die Konfiguration wird gespeichert und im Kontaktformular auf der
@@ -248,14 +195,16 @@ export function KonfiguratorSidebar({
           type="button"
           onClick={onPrepareDraft}
           disabled={isPreparingDraft}
-          className="mt-3 w-full rounded-md bg-nordwerk-orange px-4 py-2 text-sm font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-3 w-full rounded-lg bg-nordwerk-orange px-4 py-2.5 text-sm font-semibold text-black transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isPreparingDraft
             ? "Konfiguration wird vorbereitet..."
             : "Zum Kontaktformular"}
         </button>
         {draftPreparationSuccess ? (
-          <p className="mt-2 text-xs text-emerald-300">{draftPreparationSuccess}</p>
+          <p className="mt-2 text-xs text-emerald-300">
+            {draftPreparationSuccess}
+          </p>
         ) : null}
         {draftPreparationError ? (
           <p className="mt-2 text-xs text-red-300">{draftPreparationError}</p>
@@ -266,7 +215,7 @@ export function KonfiguratorSidebar({
       <button
         type="button"
         onClick={onBackToSelection}
-        className="mt-6 w-full rounded-md bg-nordwerk-orange px-4 py-2 text-sm font-semibold text-black transition hover:opacity-90"
+        className="mt-6 w-full rounded-xl bg-nordwerk-orange px-4 py-2.5 text-sm font-semibold text-black transition hover:opacity-90"
       >
         ← Zurück zur Produktauswahl
       </button>

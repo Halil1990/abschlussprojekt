@@ -1,7 +1,22 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 import { PREVIEW_DROP_ID, ZONE_DROP_PREFIX } from "../constants";
 import type { DragEndEvent } from "@dnd-kit/core";
-import type { Asset, ZoneRect } from "../types";
+import type { Asset, ZoneRectangle } from "../types";
+
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+      reject(new Error("Datei konnte nicht gelesen werden."));
+    };
+    reader.onerror = () => reject(new Error("Datei konnte nicht gelesen werden."));
+    reader.readAsDataURL(file);
+  });
+}
 
 export function useAssetManagement() {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -12,16 +27,17 @@ export function useAssetManagement() {
     [assets]
   );
 
-  const handleFiles = useCallback((files: FileList | null) => {
+  const handleFiles = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
-    const added = Array.from(files)
-      .filter((file) => file.type.startsWith("image/"))
-      .map((file) => {
-        const src = URL.createObjectURL(file);
-        urlsRef.current.push(src);
-        return { id: crypto.randomUUID(), name: file.name, src };
-      });
+    const imageFiles = Array.from(files).filter((file) => file.type.startsWith("image/"));
+    const added = await Promise.all(
+      imageFiles.map(async (file) => ({
+        id: crypto.randomUUID(),
+        name: file.name,
+        src: await readFileAsDataUrl(file),
+      })),
+    );
 
     if (added.length > 0) setAssets((prev) => [...added, ...prev]);
   }, []);
@@ -43,7 +59,7 @@ export function useAssetManagement() {
   }, []);
 
   const clearAssetFromZones = useCallback(
-    (assetId: string, zones: ZoneRect[], setZones: (zones: ZoneRect[]) => void) => {
+    (assetId: string, zones: ZoneRectangle[], setZones: (zones: ZoneRectangle[]) => void) => {
       setZones(
         zones.map((zone) =>
           zone.assetId !== assetId
@@ -64,8 +80,8 @@ export function useAssetManagement() {
     (
       zoneId: string,
       assetId: string,
-      zones: ZoneRect[],
-      setZones: (zones: ZoneRect[]) => void,
+      zones: ZoneRectangle[],
+      setZones: (zones: ZoneRectangle[]) => void,
       setSelectedZoneId: (id: string) => void
     ) => {
       setSelectedZoneId(zoneId);
@@ -88,8 +104,8 @@ export function useAssetManagement() {
   const handleDragEnd = useCallback(
     (
       event: DragEndEvent,
-      zones: ZoneRect[],
-      selectedZone: ZoneRect | null,
+      zones: ZoneRectangle[],
+      selectedZone: ZoneRectangle | null,
       assignAssetToZoneFn: (zoneId: string, assetId: string) => void
     ) => {
       const over = event.over;
