@@ -170,7 +170,7 @@ export function KonfiguratorSidebar({
       </div>
 
       <div className="mt-6 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-              <p className="font-bold uppercase underline tracking-[0.18em] text-white/70">Bitte geben Sie bei Ihrer Anfrage unbedingt die gewünschte Anzahl sowie die Größen der Kleidungsstücke an, damit wir Ihre Anfrage schnell und korrekt bearbeiten können</p>
+              <p className="font-semibold underline tracking-[0.08em]" style={{ color: '#fbbf24' }}>Bitte geben Sie bei Ihrer Anfrage unbedingt die gewünschte Anzahl sowie die Größen der Kleidungsstücke an, damit wir Ihre Anfrage schnell und korrekt bearbeiten können</p>
       </div>
       
       <div className="mt-4 rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">

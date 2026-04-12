@@ -24,6 +24,7 @@ import Footer from "../../components/layout/Footer";
 import ProductSelectionSection from "./components/ProductSelectionSection";
 import UploadModal from "./components/UploadModal";
 import { TutorialModal } from "./components/TutorialModal";
+import { KonfiguratorPartners } from "./components/KonfiguratorPartners";
 import {
   DEFAULT_WORKWEAR_INDEX,
   getMaxZonesForImage,
@@ -385,23 +386,30 @@ export default function Konfigurator() {
                   ref={(node) => {
                     setPreviewDropRef(node);
                   }}
+                  className="flex gap-6"
                 >
-                  <KonfiguratorPreview
-                    activeWorkwearIndex={activeWorkwearIndex}
-                    zones={zones}
-                    selectedZone={selectedZone}
-                    assetMap={assetMap}
-                    previewOnly={previewOnly}
-                    isOverPreview={isOverPreview}
-                    visibleProductImageIndexes={visibleProductImageIndexes}
-                    previewFrameRef={previewFrameRef}
-                    thumbnailStripRef={thumbnailStripRef}
-                    onSelectZone={setSelectedZoneId}
-                    onSelectWorkwearImage={selectWorkwearImage}
-                    onClearZone={clearZone}
-                    onRotateZone={rotateZoneById}
-                    onOpenTools={() => setIsSidebarOpen(true)}
-                  />
+                  <div className="flex-1">
+                    <KonfiguratorPreview
+                      activeWorkwearIndex={activeWorkwearIndex}
+                      zones={zones}
+                      selectedZone={selectedZone}
+                      assetMap={assetMap}
+                      previewOnly={previewOnly}
+                      isOverPreview={isOverPreview}
+                      visibleProductImageIndexes={visibleProductImageIndexes}
+                      previewFrameRef={previewFrameRef}
+                      thumbnailStripRef={thumbnailStripRef}
+                      onSelectZone={setSelectedZoneId}
+                      onSelectWorkwearImage={selectWorkwearImage}
+                      onClearZone={clearZone}
+                      onRotateZone={rotateZoneById}
+                      onOpenTools={() => setIsSidebarOpen(true)}
+                    />
+                  </div>
+
+                  <div className="hidden 2xl:block w-80">
+                    <KonfiguratorPartners activeProduct={getWorkwearProductByIndex(activeWorkwearIndex)} />
+                  </div>
                 </div>
               </div>
 

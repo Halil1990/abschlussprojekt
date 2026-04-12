@@ -137,43 +137,45 @@ export function KonfiguratorPreview({
         </div>
       </div>
 
-      <div className="mt-5 flex justify-center">
-        <div
-          ref={thumbnailStripRef}
-          className="mx-auto flex w-fit max-w-full gap-2 overflow-x-auto rounded-xl border border-white/10 bg-black/25 p-2 pb-2"
-        >
-          {visibleProductImageIndexes.map((index) => {
-            const imageUrl = WORKWEAR_IMAGES[index];
+      <div className="mt-5 flex flex-col gap-5">
+        <div className="flex justify-center">
+          <div
+            ref={thumbnailStripRef}
+            className="mx-auto flex w-fit max-w-full gap-2 overflow-x-auto rounded-xl border border-white/10 bg-black/25 p-2 pb-2"
+          >
+            {visibleProductImageIndexes.map((index) => {
+              const imageUrl = WORKWEAR_IMAGES[index];
 
-            return (
-              <div key={index} className="shrink-0">
-                <button
-                  type="button"
-                  onClick={() => onSelectWorkwearImage(index)}
-                  className={`relative overflow-hidden rounded-lg border-2 transition ${
-                    activeWorkwearIndex === index
-                      ? "border-nordwerk-orange shadow-lg shadow-nordwerk-orange/40"
-                      : "border-white/20 hover:border-white/40"
-                  }`}
-                  style={{
-                    width: "62px",
-                    height: "92px",
-                    aspectRatio: "768 / 1366",
-                  }}
-                  aria-label={`${getWorkwearProductShortLabel(activeProduct)} ${getWorkwearSideLabel(imageUrl)}`}
-                >
-                  <img
-                    src={imageUrl}
-                    alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
-                    className="h-full w-full object-cover"
-                  />
-                </button>
-                <p className="mt-1 text-center text-[11px] font-medium text-white/80">
-                  {getWorkwearSideLabel(imageUrl)}
-                </p>
-              </div>
-            );
-          })}
+              return (
+                <div key={index} className="shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => onSelectWorkwearImage(index)}
+                    className={`relative overflow-hidden rounded-lg border-2 transition ${
+                      activeWorkwearIndex === index
+                        ? "border-nordwerk-orange shadow-lg shadow-nordwerk-orange/40"
+                        : "border-white/20 hover:border-white/40"
+                    }`}
+                    style={{
+                      width: "62px",
+                      height: "92px",
+                      aspectRatio: "768 / 1366",
+                    }}
+                    aria-label={`${getWorkwearProductShortLabel(activeProduct)} ${getWorkwearSideLabel(imageUrl)}`}
+                  >
+                    <img
+                      src={imageUrl}
+                      alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                  <p className="mt-1 text-center text-[11px] font-medium text-white/80">
+                    {getWorkwearSideLabel(imageUrl)}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
