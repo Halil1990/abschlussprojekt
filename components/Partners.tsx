@@ -12,7 +12,6 @@ const partners = [
   { src: "/partner_6.jpg", alt: "Partner 6" },
 ];
 
-const VISIBLE_PARTNERS = 3;
 const CAROUSEL_SPEED_PX_PER_SECOND = 42;
 
 export default function Partners() {

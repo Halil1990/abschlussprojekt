@@ -37,7 +37,6 @@ export function useWorkwearPersistence(
   useEffect(() => {
     let isMounted = true;
     const availableIndexes = new Set<number>();
-    let loadedCount = 0;
 
     const checkImageAvailability = async () => {
       const checkPromises = WORKWEAR_IMAGES.map((imageUrl, index) => {
