@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { CUSTOMER_REVIEWS } from "../constants";
 import type { WorkwearProductId } from "../constants";
 
@@ -32,33 +33,97 @@ const partners = [
   { src: "/partner2.jpg", alt: "Partner 2" },
   { src: "/partner1.jpg", alt: "Partner 1" },
   { src: "/partner3.jpg", alt: "Partner 3" },
+  { src: "/partner_4.jpg", alt: "Partner 4" },
+  { src: "/partner_5.png", alt: "Partner 5" },
+  { src: "/partner_6.jpg", alt: "Partner 6" },
 ];
+
+const PARTNER_SCROLL_SPEED_PX_PER_SECOND = 30;
 
 interface KonfiguratorPartnersProps {
   activeProduct?: WorkwearProductId;
 }
 
 export function KonfiguratorPartners({ activeProduct }: KonfiguratorPartnersProps) {
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const loopedPartners = [...partners, ...partners];
+
+  useEffect(() => {
+    const track = trackRef.current;
+
+    if (!track) {
+      return;
+    }
+
+    let frameId = 0;
+    let startTimestamp: number | null = null;
+    let loopHeight = 0;
+
+    const measureLoopHeight = () => {
+      const firstItem = track.children.item(0) as HTMLElement | null;
+      const duplicateStartItem = track.children.item(partners.length) as HTMLElement | null;
+
+      if (!firstItem || !duplicateStartItem) {
+        return;
+      }
+
+      loopHeight = duplicateStartItem.offsetTop - firstItem.offsetTop;
+    };
+
+    measureLoopHeight();
+    const resizeObserver = new ResizeObserver(() => {
+      measureLoopHeight();
+    });
+    resizeObserver.observe(track);
+
+    const animate = (timestamp: number) => {
+      if (loopHeight <= 0) {
+        frameId = window.requestAnimationFrame(animate);
+        return;
+      }
+
+      if (startTimestamp === null) {
+        startTimestamp = timestamp;
+      }
+
+      const elapsedSeconds = (timestamp - startTimestamp) / 1000;
+      const traveledDistance = (elapsedSeconds * PARTNER_SCROLL_SPEED_PX_PER_SECOND) % loopHeight;
+      const offsetY = -loopHeight + traveledDistance;
+
+      track.style.transform = `translateY(${offsetY}px)`;
+      frameId = window.requestAnimationFrame(animate);
+    };
+
+    frameId = window.requestAnimationFrame(animate);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   return (
     <div className="rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
       <h3 className="text-lg font-semibold text-white">
         Unsere Partner
       </h3>
-      <div className="mt-6 flex flex-col gap-12">
-        {partners.map((partner, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-4 transition hover:bg-white/10"
-          >
-            <Image
-              src={partner.src}
-              alt={partner.alt}
-              width={220}
-              height={120}
-              className="h-20 w-auto rounded-lg object-contain"
-            />
-          </div>
-        ))}
+      <div className="mt-6 h-96 overflow-x-visible overflow-y-hidden">
+        <div ref={trackRef} className="flex flex-col gap-12 will-change-transform">
+          {loopedPartners.map((partner, index) => (
+            <div
+              key={`${partner.src}-${index}`}
+              className="flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-4 py-4 transition hover:bg-white/10"
+            >
+              <Image
+                src={partner.src}
+                alt={partner.alt}
+                width={220}
+                height={120}
+                className={`w-auto rounded-lg object-contain ${partner.src === "/partner_6.jpg" ? "h-20 sm:h-24" : "h-20"}`}
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Customer Reviews */}

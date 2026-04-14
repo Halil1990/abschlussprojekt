@@ -238,7 +238,7 @@ export default function SizeChartModal({ isOpen, onClose }: SizeChartModalProps)
           </button>
         </div>
 
-        <div className="mt-4 space-y-3">
+        <div className="mt-5 space-y-6">
           {sections.map((section) => {
             const [headerRow, ...bodyRows] = section.rows;
 
