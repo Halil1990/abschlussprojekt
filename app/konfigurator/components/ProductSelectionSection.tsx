@@ -1,5 +1,4 @@
-/* eslint-disable @next/next/no-img-element */
-
+import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import {
@@ -85,12 +84,12 @@ export default function ProductSelectionSection({
                       className="relative mx-auto w-full max-w-[320px] overflow-hidden rounded-[1.4rem] border border-white/10 bg-black/25 shadow-[0_14px_34px_rgba(0,0,0,0.35)]"
                       style={{ aspectRatio: "768 / 1320" }}
                     >
-                      <img
+                      <Image
                         src={previewImage}
                         alt={`${productLabel} Vorschau in ${selectedColorLabel}`}
-                        loading="lazy"
-                        decoding="async"
-                        className="pointer-events-none h-full w-full select-none object-contain"
+                        fill
+                        sizes="(max-width: 640px) 100vw, 320px"
+                        className="pointer-events-none select-none object-contain"
                         onError={() => {
                           setFailedColorImageKeySet((prev) => {
                             if (prev.has(colorImageKey)) return prev;

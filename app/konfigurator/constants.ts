@@ -208,7 +208,7 @@ export const ZONE_TEMPLATES_BY_PRODUCT_AND_VIEW: Record<
 > = {
   jacke: {
     vorne: [
-      { x: 30, y: 37, w: 12, h: 7.2, artworkScalable: true },
+      { x: 30, y: 37, w: 12, h: 7.2, },
     ],
     hinten: [
       { x: 47, y: 18, w: 8, h: 2.7 },
@@ -223,12 +223,12 @@ export const ZONE_TEMPLATES_BY_PRODUCT_AND_VIEW: Record<
   },
   hose: {
     vorne: [
-      { x: 30, y: 24, w: 11.3, h: 6.3 },
-      { x: 56, y: 24, w: 11.3, h: 6.3 },
+      { x: 34, y: 33, w: 11.3, h: 6.3 },
+      { x: 54, y: 33, w: 11.3, h: 6.3 },
     ],
     hinten: [
-      { x: 30, y: 24, w: 11.3, h: 6.3 },
-      { x: 56, y: 24, w: 11.3, h: 6.3 },
+      { x: 48, y: 24, w: 8, h: 2.7 },
+      { x: 56.5, y: 28.5, w: 11.3, h: 6.3 },
     ],
     links: [
       { x: 30, y: 24, w: 11.3, h: 6.3 },
@@ -263,8 +263,8 @@ export const ZONE_TEMPLATES_BY_PRODUCT_AND_VIEW: Record<
       { x: 62, y: 38, w: 11.3, h: 6.3 },
     ],
     hinten: [
-      { x: 27, y: 38, w: 11.3, h: 6.3 },
-      { x: 62, y: 38, w: 11.3, h: 6.3 },
+      { x: 40, y: 12.5, w: 20, h: 5 },
+      { x: 24, y: 28, w: 52, h: 34.7, artworkMovable: true, artworkScalable: true }
     ],
     links: [
       { x: 27, y: 38, w: 11.3, h: 6.3 },

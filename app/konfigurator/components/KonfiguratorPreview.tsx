@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 
+import Image from "next/image";
 import WorkwearZone from "./WorkwearZone";
 import type { Asset, ZoneRectangle } from "../types";
 import { WORKWEAR_IMAGES, ZONE_DROP_PREFIX } from "../constants";
@@ -75,12 +76,13 @@ export function KonfiguratorPreview({
                 className="absolute inset-0 origin-center transition-transform duration-200"
                 style={{ transform: "none" }}
               >
-                <img
+                <Image
                   src={activeWorkwearImage}
                   alt={`Workwear ${getWorkwearProductShortLabel(activeProduct)}`}
-                  fetchPriority="high"
-                  decoding="async"
-                  className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
+                  fill
+                  priority
+                  sizes="(max-width: 1280px) 100vw, 768px"
+                  className="pointer-events-none select-none object-contain"
                 />
 
                 {previewOnly
@@ -169,12 +171,12 @@ export function KonfiguratorPreview({
                     }}
                     aria-label={`${getWorkwearProductShortLabel(activeProduct)} ${getWorkwearSideLabel(imageUrl)}`}
                   >
-                    <img
+                    <Image
                       src={imageUrl}
                       alt={`${getWorkwearProductShortLabel(activeProduct)} Thumbnail ${getWorkwearSideLabel(imageUrl)}`}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-full w-full object-cover"
+                      fill
+                      sizes="62px"
+                      className="object-cover"
                     />
                   </button>
                   <p className="mt-1 text-center text-[11px] font-medium text-white/80">
