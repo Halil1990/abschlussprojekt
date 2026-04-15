@@ -45,16 +45,39 @@ export default function ProductSelectionSection({
     () => new Set(),
   );
 
+  const productMeta: Record<WorkwearProductId, { ref: string; description: string }> = {
+    jacke: {
+      ref: "REF / J-402",
+      description: "Robuste Arbeitsjacke mit funktionalen Zonen für den täglichen Einsatz.",
+    },
+    hose: {
+      ref: "REF / H-882",
+      description: "Strapazierfähige Bundhose mit Verstärkungen und bequemem Sitz.",
+    },
+    weste: {
+      ref: "REF / W-112",
+      description: "Leichte Weste mit viel Bewegungsfreiheit und praktischen Taschen.",
+    },
+    latzhose: {
+      ref: "REF / L-990",
+      description: "Komfortable Latzhose mit durchdachtem Schnitt für lange Arbeitstage.",
+    },
+  };
+
+  const productDisplayNames: Record<WorkwearProductId, string> = {
+    jacke: "Jacke",
+    weste: "Weste",
+    hose: "Stretchhose",
+    latzhose: " Latzhose",
+  };
+
   return (
     <>
-      <p className="mx-auto mt-3 max-w-2xl text-center text-black">
-        Bitte Produkt auswählen und danach im Konfigurator bearbeiten.
-      </p>
-
-      <section className="mx-auto mt-8 max-w-5xl rounded-4xl border border-white/20 bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] p-4 shadow-[0_20px_45px_rgba(0,0,0,0.35)] backdrop-blur-md sm:p-5">
-        <div className="grid gap-5 sm:grid-cols-2">
+      <section className="mx-auto mt-8 max-w-7xl overflow-hidden rounded-2xl ">
+        <div className="p-4 sm:p-5">
+          <div className="grid gap-6 pt-6 md:grid-cols-2 md:gap-12 md:pt-8">
           {orderedProducts.map((product) => {
-              const productLabel = product.label;
+              const productLabel = productDisplayNames[product.id] ?? product.label;
               const selectedColorId = selectedColorByProduct[product.id];
               const colorImageKey = product.id + ':' + selectedColorId;
               const defaultPreviewImage = getWorkwearProductPreviewImage(product.id);
@@ -68,28 +91,26 @@ export default function ProductSelectionSection({
               const selectedColorLabel =
                 WORKWEAR_PREVIEW_COLORS.find((color) => color.id === selectedColorId)
                   ?.label ?? WORKWEAR_PREVIEW_COLORS[0].label;
+              const meta = productMeta[product.id];
 
               return (
                 <article
                   key={product.id}
-                  className="
-                    rounded-4xl border border-white/20 bg-white/5 p-4
-                    shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]
-                    transition-all duration-200
-                    hover:border-white/35
-                  "
+                  className="grid overflow-hidden rounded-xl  bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] hover:border-zinc-600 sm:grid-cols-[1fr_1fr]"
                 >
-                  <div className="rounded-2xl border border-white/15 bg-white/5 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+                  <div className="p-3 sm:p-4">
                     <div
-                      className="relative mx-auto w-full max-w-[320px] overflow-hidden rounded-[1.4rem] border border-white/10 bg-black/25 shadow-[0_14px_34px_rgba(0,0,0,0.35)]"
-                      style={{ aspectRatio: "768 / 1320" }}
+                      className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-black/25 shadow-[0_14px_34px_rgba(0,0,0,0.35)]"
+                      style={{ aspectRatio: "1 / 1" }}
                     >
                       <Image
                         src={previewImage}
                         alt={`${productLabel} Vorschau in ${selectedColorLabel}`}
                         fill
                         sizes="(max-width: 640px) 100vw, 320px"
-                        className="pointer-events-none select-none object-contain"
+                        className={`pointer-events-none select-none object-contain p-6 sm:p-7 ${
+                          product.id === "latzhose" ? "scale-130" : ""
+                        }`}
                         onError={() => {
                           setFailedColorImageKeySet((prev) => {
                             if (prev.has(colorImageKey)) return prev;
@@ -101,10 +122,21 @@ export default function ProductSelectionSection({
                       />
                     </div>
                   </div>
-                  <h2 className="mt-4 text-center text-xl font-semibold text-white">
-                    {productLabel}
-                  </h2>
-                  <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+
+                  <div className="flex flex-col justify-between p-5 sm:p-6">
+                    <div>
+                      <h2 className="text-[2.1rem] font-bold leading-none text-zinc-200">
+                        {productLabel}
+                      </h2>
+                      <p className="mt-2 text-sm font-medium leading-relaxed text-zinc-400">
+                        {meta.description}
+                      </p>
+                      <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.09em] text-zinc-500">
+                        Farbauswahl
+                      </p>
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
                     {WORKWEAR_PREVIEW_COLORS.map((color) => {
                       const isActive = selectedColorId === color.id;
                       return (
@@ -117,10 +149,10 @@ export default function ProductSelectionSection({
                               [product.id]: color.id,
                             }));
                           }}
-                          className={`h-7 min-w-7 rounded-full border-2 px-2 text-[10px] font-semibold uppercase tracking-[0.08em] transition ${
+                          className={`h-7 w-7 rounded-full border-2 transition ${
                             isActive
-                              ? "border-nordwerk-orange text-white"
-                              : "border-white/35 text-white/75 hover:border-white/60 hover:text-white"
+                              ? "border-[#f59e0b] shadow-[0_0_0_1px_rgba(245,158,11,0.75)]"
+                              : "border-zinc-200/70 hover:border-zinc-100"
                           }`}
                           style={{ backgroundColor: color.hex }}
                           aria-pressed={isActive}
@@ -131,17 +163,20 @@ export default function ProductSelectionSection({
                         </button>
                       );
                     })}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => onStartConfigurator(product.id)}
+                      className="mt-5 w-full rounded-md bg-nordwerk-orange px-4 py-3 text-base font-bold uppercase tracking-[0.06em] text-zinc-900 transition hover:brightness-105"
+                    >
+                      Konfigurieren
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => onStartConfigurator(product.id)}
-                    className="mt-4 w-full rounded-md bg-nordwerk-orange px-4 py-2 text-sm font-semibold text-black hover:scale-105 hover:text-white transition"
-                  >
-                    Konfigurieren
-                  </button>
                 </article>
               );
             })}
+          </div>
         </div>
       </section>
     </>

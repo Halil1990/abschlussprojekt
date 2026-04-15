@@ -313,7 +313,7 @@ export default function Konfigurator() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed px-4 pb-16 pt-8 sm:px-6 sm:pt-10">
+      <main className="min-h-screen bg-cover bg-center bg-no-repeat bg-fixed px-4 pb-16 pt-12 sm:px-6 sm:pt-16">
         {hasStartedConfigurator ? (
           <button
             type="button"
@@ -330,15 +330,50 @@ export default function Konfigurator() {
         ) : null}
 
         <div className="mx-auto max-w-7xl">
-          <h1 className="hidden text-center text-3xl text-black md:block md:text-4xl">
-            Die Konfiguration dient als Grundlage für deine Anfrage.
-            <br />
-            Nach Prüfung erhältst du ein individuelles Angebot.
-          </h1>
           {!hasStartedConfigurator ? (
-            <ProductSelectionSection
-              onStartConfigurator={startConfiguratorForProduct}
-            />
+            <>
+              <section className="mx-auto mb-8 w-full max-w-6xl rounded-2xl  bg-white px-4 py-5 shadow-sm sm:px-6 sm:py-6">
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:items-start">
+                  <div className="relative text-center">
+                    <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nordwerk-orange text-lg font-bold text-black">
+                      1
+                    </span>
+                    <p className="mt-2 text-[1.35rem] font-bold leading-tight text-black">Produkt auswählen</p>
+                    <span className="pointer-events-none absolute -right-4.5 top-5 hidden text-3xl leading-none text-slate-300 lg:block">→</span>
+                  </div>
+
+                  <div className="relative text-center">
+                    <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nordwerk-orange text-lg font-bold text-black">
+                      2
+                    </span>
+                    <p className="mt-2 text-[1.35rem] font-bold leading-tight text-black">Konfigurieren</p>
+                    <span className="pointer-events-none absolute -right-4.5 top-5 hidden text-3xl leading-none text-slate-300 lg:block">→</span>
+                  </div>
+
+                  <div className="relative text-center">
+                    <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nordwerk-orange text-lg font-bold text-black">
+                      3
+                    </span>
+                    <p className="mt-2 text-[1.35rem] font-bold leading-tight text-black">Anfrage senden</p>
+                    <span className="pointer-events-none absolute -right-4.5 top-5 hidden text-3xl leading-none text-slate-300 lg:block">→</span>
+                  </div>
+
+                  <div className="text-center">
+                    <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-nordwerk-orange text-lg font-bold text-black">
+                      4
+                    </span>
+                    <p className="mt-2 text-[1.35rem] font-bold leading-tight text-black">Angebot erhalten</p>
+                  </div>
+                </div>
+              </section>
+
+              <ProductSelectionSection
+                onStartConfigurator={startConfiguratorForProduct}
+              />
+              <h1 className="mt-8 hidden text-center text-2xl font-bold text-black md:block md:text-4xl pt-10">
+                Auf Basis deiner Konfiguration prüfen wir deine Anfrage und erstellen dir im Anschluss ein individuelles Angebot.
+              </h1>
+            </>
           ) : (
             <DndContext
               sensors={sensors}
