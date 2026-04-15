@@ -1,181 +1,125 @@
 # Workwear Konfigurator
 
-Konfigurator für Workwear-Produkte mit festen, template-basierten Zonen pro Produktansicht.
+Der Konfigurator ist für Arbeitskleidung mit festen Druckzonen.
 
-## Überblick
+## Was passiert hier?
 
-Der Konfigurator ist in zwei Bereiche aufgeteilt:
+Es gibt zwei Bereiche:
 
-- Links: Asset-Auswahl, Zonen-Auswahl, Rotation, Material und Anfrage-Flow
-- Rechts: Produktvorschau mit festen Zonen und Thumbnail-Navigation
+- Auswahl in [page.tsx](page.tsx)
+  - Oben siehst du 4 Schritte
+  - Darunter wählst du ein Produkt in [components/ProductSelectionSection.tsx](components/ProductSelectionSection.tsx)
+- Konfiguration in [page.tsx](page.tsx)
+  - Links: Upload, Material, Anfrage
+  - Rechts: Vorschau mit festen Zonen
 
-Zonen sind nicht mehr per Drag/Resize veränderbar. Ihre Position, Größe und Anzahl werden zentral in [constants.ts](constants.ts) definiert und in [utils/zoneCalculations.ts](utils/zoneCalculations.ts) daraus erzeugt.
+Die Zonen sind fest. Man kann sie nicht ziehen oder größer/kleiner machen.
+Die Werte kommen aus [constants.ts](constants.ts) und werden in [utils/zoneCalculations.ts](utils/zoneCalculations.ts) genutzt.
 
-## Features
+## Funktionen
 
-- Drag & Drop von Logos auf feste Zonen
-- Rotation in 5°-Schritten
-- Entfernen von Assets aus einer Zone
-- Pro Bildansicht konfigurierbare Zonenanzahl
-- Pro Zone konfigurierbare Position und Größe
-- Draft-Erstellung für das Kontaktformular
-- Preview-Ansicht mit Thumbnail-Navigation
+- Produkt wählen + Farbe wählen
+- 4 Schritte:
+  - Produkt auswählen
+  - Konfigurieren
+  - Anfrage senden
+  - Angebot erhalten
+- Logo per Drag & Drop auf eine Zone legen
+- Logo drehen (in 5-Grad-Schritten)
+- Logo aus Zone entfernen
+- Entwurf für Kontaktformular erstellen
+- Vorschau mit kleinen Bild-Buttons (Thumbnails)
 
-## Struktur
+## Wichtige Dateien
 
-### Kern-Dateien
+| Datei | Zweck |
+|-------|------|
+| [page.tsx](page.tsx) | Hauptseite vom Konfigurator |
+| [constants.ts](constants.ts) | Produkte, Bilder, Farben, Zonen |
+| [types.ts](types.ts) | Gemeinsame Typen |
+| [workwearState.ts](workwearState.ts) | Speichert den Zustand pro Bild in der Session |
+| [submission.ts](submission.ts) | Baut die Daten für den Versand |
+| [submissionDraft.ts](submissionDraft.ts) | Entwurf für sessionStorage |
 
-| Datei | Beschreibung |
-|-------|-------------|
-| [page.tsx](page.tsx) | Orchestriert Hook-State, Sidebar und Preview |
-| [constants.ts](constants.ts) | Produktdaten, Bildpfade, Zonen-Templates und Zonenanzahl pro Bild |
-| [types.ts](types.ts) | Gemeinsame Typen wie Asset, ZoneRectangle und PrintMaterial |
-| [workwearState.ts](workwearState.ts) | Normalisierung und Wiederherstellung des In-Memory-Zone-States |
-| [submission.ts](submission.ts) | Erzeugung der Snapshots vor dem Versand |
-| [submissionDraft.ts](submissionDraft.ts) | Draft-Struktur für sessionStorage |
+## Hooks
 
-### Hooks
+| Hook | Datei | Zweck |
+|------|-------|------|
+| [useZoneState](hooks/useZoneState.ts) | [hooks/useZoneState.ts](hooks/useZoneState.ts) | Auswahl und Änderungen an Zonen |
+| [useAssetManagement](hooks/useAssetManagement.ts) | [hooks/useAssetManagement.ts](hooks/useAssetManagement.ts) | Upload und Asset-Zuordnung |
+| [useWorkwearPersistence](hooks/useWorkwearPersistence.ts) | [hooks/useWorkwearPersistence.ts](hooks/useWorkwearPersistence.ts) | Zustand je Bild und Draft |
 
-| Hook | Datei | Beschreibung |
-|------|-------|-------------|
-| [useZoneState](hooks/useZoneState.ts) | [hooks/useZoneState.ts](hooks/useZoneState.ts) | Zone-Auswahl, Rotation und Zonen-Updates |
-| [useAssetManagement](hooks/useAssetManagement.ts) | [hooks/useAssetManagement.ts](hooks/useAssetManagement.ts) | Upload, Asset-Zuordnung und Cleanup |
-| [useWorkwearPersistence](hooks/useWorkwearPersistence.ts) | [hooks/useWorkwearPersistence.ts](hooks/useWorkwearPersistence.ts) | In-Memory-State pro Bild und Draft-Erstellung |
+## Komponenten
 
-### Komponenten
-
-| Komponente | Datei | Beschreibung |
-|-----------|-------|-------------|
-| [KonfiguratorSidebar](components/KonfiguratorSidebar.tsx) | [components/KonfiguratorSidebar.tsx](components/KonfiguratorSidebar.tsx) | Controls, Upload, Material und Anfrage |
-| [KonfiguratorPreview](components/KonfiguratorPreview.tsx) | [components/KonfiguratorPreview.tsx](components/KonfiguratorPreview.tsx) | Produktvorschau und Zonen-Rendering |
-| [WorkwearZone](components/WorkwearZone.tsx) | [components/WorkwearZone.tsx](components/WorkwearZone.tsx) | Eine einzelne feste Zone mit Asset-Buttons |
-| [DraggableAssetCard](components/DraggableAssetCard.tsx) | [components/DraggableAssetCard.tsx](components/DraggableAssetCard.tsx) | Draggbare Asset-Karte |
-| [ProductSelectionSection](components/ProductSelectionSection.tsx) | [components/ProductSelectionSection.tsx](components/ProductSelectionSection.tsx) | Produkt-Auswahl |
+| Komponente | Datei | Zweck |
+|-----------|-------|------|
+| [ProductSelectionSection](components/ProductSelectionSection.tsx) | [components/ProductSelectionSection.tsx](components/ProductSelectionSection.tsx) | Produktkarten und Farbwahl |
+| [KonfiguratorSidebar](components/KonfiguratorSidebar.tsx) | [components/KonfiguratorSidebar.tsx](components/KonfiguratorSidebar.tsx) | Einstellungen links |
+| [KonfiguratorPreview](components/KonfiguratorPreview.tsx) | [components/KonfiguratorPreview.tsx](components/KonfiguratorPreview.tsx) | Vorschau rechts |
+| [WorkwearZone](components/WorkwearZone.tsx) | [components/WorkwearZone.tsx](components/WorkwearZone.tsx) | Einzelne Zone |
+| [DraggableAssetCard](components/DraggableAssetCard.tsx) | [components/DraggableAssetCard.tsx](components/DraggableAssetCard.tsx) | Karte für Drag & Drop |
 | [UploadModal](components/UploadModal.tsx) | [components/UploadModal.tsx](components/UploadModal.tsx) | Datei-Upload |
+| [TutorialModal](components/TutorialModal.tsx) | [components/TutorialModal.tsx](components/TutorialModal.tsx) | Hilfe-Fenster |
 
-## Zonen-Modell
+## Zonen (kurz erklärt)
 
-### ZoneRectangle
+Zone-Daten stehen in [constants.ts](constants.ts):
 
-```typescript
-{
-  id: string;
-  label: string;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  scale: number;
-  rotation: number;
-  assetId: string | null;
-  artworkOffset: Point;
-}
-```
+- `ZONE_TEMPLATES_BY_PRODUCT_AND_VIEW`
+- `getZoneTemplatesForImage()`
+- `getMaxZonesForImage()`
 
-### Template-Quelle
+Eine Zone hat z. B. `x`, `y`, `w`, `h`, `rotation`, `assetId`.
 
-Die aktive Zone-Konfiguration pro Bild kommt aus:
+## Verhalten und Speicher
 
-- [ZONE_TEMPLATES_BY_PRODUCT_AND_VIEW](constants.ts)
-- [getZoneTemplatesForImage()](constants.ts)
-- [getMaxZonesForImage()](constants.ts)
+- Kein LocalStorage für den normalen Ablauf
+- Zustand bleibt in der laufenden Session im Speicher
+- Draft wird erst beim Senden in sessionStorage gelegt
 
-Die Zonen werden in [createZone()](utils/zoneCalculations.ts) aus den Templates erzeugt und in [workwearState.ts](workwearState.ts) auf die aktive Ansicht normalisiert.
+## So passt du Dinge an
 
-## Verhalten
+### Zonen ändern
 
-- Keine Drag-/Resize-Bedienung für Zonen
-- Keine LocalStorage-Persistenz für den Zone-Stand
-- Der aktuelle Workwear-Stand bleibt während der Session im Speicher, damit das Wechseln zwischen Ansichten funktioniert
-- Drafts werden nur beim Absenden in sessionStorage abgelegt
+In [constants.ts](constants.ts) unter `ZONE_TEMPLATES_BY_PRODUCT_AND_VIEW`.
 
-## Anpassungen
-
-### 1. Zonen für ein Bild ändern
-
-In [constants.ts](constants.ts) in `ZONE_TEMPLATES_BY_PRODUCT_AND_VIEW`.
-
-Jeder Eintrag ist eine Zone mit:
-
-- `x` = Position links in Prozent
-- `y` = Position oben in Prozent
+- `x` = links in Prozent
+- `y` = oben in Prozent
 - `w` = Breite in Prozent
 - `h` = Höhe in Prozent
 
-Die Anzahl der Einträge bestimmt direkt die Anzahl der Zonen pro Bild.
+### Produktnamen in der Auswahl ändern
 
-### 2. Zonenanzahl pro Bild ändern
+In [components/ProductSelectionSection.tsx](components/ProductSelectionSection.tsx) bei `productDisplayNames`.
 
-Auch in [constants.ts](constants.ts) über die Länge des jeweiligen Template-Arrays.
+### Farben der Auswahl ändern
 
-Beispiel:
+In [constants.ts](constants.ts) bei `WORKWEAR_PREVIEW_COLORS`.
 
-```typescript
-jacke: {
-  vorne: [
-    { x: 27, y: 37, w: 12, h: 7.2 },
-  ],
-  hinten: [
-    { x: 47, y: 18, w: 8, h: 2.7 },
-    { x: 24, y: 28, w: 52, h: 34.7 },
-  ],
-}
-```
+### Neue Produktansicht hinzufügen
 
-### 3. Neue Produktansicht hinzufügen
+In [constants.ts](constants.ts):
 
-Anpassung in [constants.ts](constants.ts):
+- Neues Produkt in `WORKWEAR_PRODUCTS`
+- Bildpfade ergänzen
+- Zonen-Templates ergänzen
 
-- Produkt in `WORKWEAR_PRODUCTS` ergänzen
-- Passende Bildpfade in `WORKWEAR_VIEW_FILENAMES` oder im Storage-Layout bereitstellen
-- Templates in `ZONE_TEMPLATES_BY_PRODUCT_AND_VIEW` definieren
+### Rotationsschritte ändern
 
-### 4. Rotation anpassen
-
-In [page.tsx](page.tsx) werden die Buttons mit `-5` und `+5` Grad verbunden.
-
-### 5. Preview-Styling ändern
-
-Die visuelle Gestaltung der Vorschau liegt in [components/KonfiguratorPreview.tsx](components/KonfiguratorPreview.tsx). Sie nutzt bewusst dieselbe Card-Sprache wie die Sidebar.
+In [page.tsx](page.tsx) die Werte `-5` und `+5` anpassen.
 
 ## API-Routen
 
-| Route | Beschreibung |
-|-------|-------------|
-| `POST /api/contact` | Kontaktformular absenden |
-| `POST /api/konfigurator/submit` | Konfiguration absenden |
+| Route | Zweck |
+|-------|------|
+| `POST /api/contact` | Kontaktformular senden |
+| `POST /api/konfigurator/submit` | Konfiguration senden |
 
-## Persistenz
-
-- Kein LocalStorage für den Konfigurator-Workflow
-- sessionStorage nur für den Draft vor dem Absenden
-
-## Workwear-Produkte
-
-Aktuell unterstützt:
+## Unterstützte Produkte
 
 - Jacke
 - Hose
 - Latzhose
 - Weste
 
-Die Bild-Reihenfolge wird aus [WORKWEAR_PRODUCTS](constants.ts) und [WORKWEAR_VIEW_FILENAMES](constants.ts) zusammengesetzt.
-
-## Styling
-
-Der Konfigurator verwendet eine konsistente Kartenoptik mit:
-
-- dunklen, leicht verlaufenden Hintergründen
-- weißen Borders mit Transparenz
-- Orange als Akzentfarbe
-- abgerundeten Cards und kontrollierten Schatten
-
-Die zentrale Tailwind-Optik liegt in [components/KonfiguratorSidebar.tsx](components/KonfiguratorSidebar.tsx) und [components/KonfiguratorPreview.tsx](components/KonfiguratorPreview.tsx).
-
-## Hinweise
-
-- [types.ts](types.ts) enthält keine Drag-/Resize-State-Typen mehr
-- [utils/zoneCalculations.ts](utils/zoneCalculations.ts) arbeitet direkt mit den Zone-Templates
-- Alte Backup- und Doku-Reste wie [page.tsx.bak](page.tsx.bak) wurden nicht automatisch entfernt
-
-💡 Tipp: Mit Cmd/Ctrl+Click auf die Links kannst du direkt in die jeweiligen Dateien springen.
+Die Bildreihenfolge wird aus [WORKWEAR_PRODUCTS](constants.ts) und [WORKWEAR_VIEW_FILENAMES](constants.ts) gebaut.

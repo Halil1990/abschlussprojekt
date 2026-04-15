@@ -92,11 +92,12 @@ export default function ProductSelectionSection({
                 WORKWEAR_PREVIEW_COLORS.find((color) => color.id === selectedColorId)
                   ?.label ?? WORKWEAR_PREVIEW_COLORS[0].label;
               const meta = productMeta[product.id];
+              const imageScaleClass = product.id === "latzhose" ? "scale-130" : "";
 
               return (
                 <article
                   key={product.id}
-                  className="grid overflow-hidden rounded-xl  bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] hover:border-zinc-600 sm:grid-cols-[1fr_1fr]"
+                  className="grid overflow-hidden rounded-xl bg-[linear-gradient(160deg,rgba(8,8,8,0.72),rgba(20,20,20,0.5))] sm:grid-cols-[1fr_1fr]"
                 >
                   <div className="p-3 sm:p-4">
                     <div
@@ -108,9 +109,7 @@ export default function ProductSelectionSection({
                         alt={`${productLabel} Vorschau in ${selectedColorLabel}`}
                         fill
                         sizes="(max-width: 640px) 100vw, 320px"
-                        className={`pointer-events-none select-none object-contain p-6 sm:p-7 ${
-                          product.id === "latzhose" ? "scale-130" : ""
-                        }`}
+                        className={`pointer-events-none select-none object-contain p-6 sm:p-7 ${imageScaleClass}`}
                         onError={() => {
                           setFailedColorImageKeySet((prev) => {
                             if (prev.has(colorImageKey)) return prev;
@@ -168,7 +167,7 @@ export default function ProductSelectionSection({
                     <button
                       type="button"
                       onClick={() => onStartConfigurator(product.id)}
-                      className="mt-5 w-full rounded-md bg-nordwerk-orange px-4 py-3 text-base font-bold uppercase tracking-[0.06em] text-zinc-900 transition hover:brightness-105"
+                      className="mt-5 w-full rounded-md bg-nordwerk-orange px-4 py-3 text-base font-bold uppercase tracking-[0.06em] text-zinc-900 transition-transform duration-200 hover:scale-[1.02] hover:brightness-105"
                     >
                       Konfigurieren
                     </button>
