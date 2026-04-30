@@ -45,7 +45,7 @@ Ablauf im Frontend:
 - Die Konfigurations-Snapshots werden als Draft im Browser gespeichert.
 - Auf der Startseite wird nur das Haupt-Kontaktformular verwendet und sendet den Draft mit.
 
-### Benoetigte Umgebungsvariablen
+### Benötigte Umgebungsvariablen
 
 ```bash
 SUPABASE_URL=https://<project-ref>.supabase.co
@@ -66,7 +66,7 @@ Hinweis:
 - Bei privaten Buckets werden signierte Links per E-Mail versendet.
 - `SUPABASE_SIGNED_URL_EXPIRES_IN` ist in Sekunden (Standard: 604800 = 7 Tage).
 
-### Beispiel SQL fuer die Anfrage-Tabelle
+### Beispiel SQL für die Anfrage-Tabelle
 
 ```sql
 create table if not exists public.konfigurator_requests (
